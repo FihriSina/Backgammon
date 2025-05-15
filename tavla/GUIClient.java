@@ -1,6 +1,4 @@
-package tavla.istemci;
-
-import tavla.mesajlasma.Message;
+package tavla;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,12 +21,12 @@ public class GUIClient extends JFrame {
         setSize(900, 600);
         setLayout(null);
 
-        // Tavla tahtası resmi
+        // Tahta görseli
         boardLabel = new JLabel(new ImageIcon("assets/tavla_board.png"));
         boardLabel.setBounds(0, 0, 900, 500);
         add(boardLabel);
 
-        // 24 görünmez point button'ı
+        // Tahta üstü tıklanabilir 24 hane butonu
         for (int i = 0; i < 24; i++) {
             JButton pointButton = new JButton();
             pointButton.setBounds(getXForPoint(i), getYForPoint(i), 30, 30);
@@ -40,7 +38,7 @@ public class GUIClient extends JFrame {
             add(pointButton);
         }
 
-        // Zar görselleri
+        // Zarlar
         dice1Label = new JLabel(new ImageIcon("assets/dice_1.png"));
         dice2Label = new JLabel(new ImageIcon("assets/dice_1.png"));
         dice1Label.setBounds(300, 510, 64, 64);
@@ -48,11 +46,9 @@ public class GUIClient extends JFrame {
         add(dice1Label);
         add(dice2Label);
 
-        // Zar atma butonu
+        // Zar At Butonu
         rollButton = new JButton("Zar At");
         rollButton.setBounds(460, 510, 100, 30);
-        add(rollButton);
-
         rollButton.addActionListener(e -> {
             try {
                 output.writeObject(new Message(Message.MessageType.ROLL_DICE, 0, null));
@@ -60,6 +56,7 @@ public class GUIClient extends JFrame {
                 JOptionPane.showMessageDialog(this, "Zar gönderilemedi.");
             }
         });
+        add(rollButton);
 
         connectToServer();
     }

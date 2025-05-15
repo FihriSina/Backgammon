@@ -1,4 +1,4 @@
-package tavla.oyunMantigi;
+package tavla;
 
 import java.io.Serializable;
 

@@ -1,5 +1,4 @@
-package tavla.oyunMantigi;
-
+package tavla;
 
 import java.io.Serializable;
 import java.util.Random;
@@ -7,9 +6,9 @@ import java.util.Random;
 public class GameLogic implements Serializable {
 
     private Board board;
-    private int currentPlayer; // 0 veya 1
-    private int[] dice;        // Zar sonuçları 
-    private boolean[] diceUsed; // Zarların kullanılıp kullanılmadığı
+    private int currentPlayer;
+    private int[] dice;
+    private boolean[] diceUsed;
     private Random rand;
 
     public GameLogic() {
@@ -51,16 +50,11 @@ public class GameLogic implements Serializable {
     }
 
     public boolean move(int from, int to) {
-        if (!isValidMove(from, to))
-            return false;
+        if (!isValidMove(from, to)) return false;
 
         int distance = Math.abs(to - from);
-
-        if (distance == dice[0] && !diceUsed[0]) {
-            diceUsed[0] = true;
-        } else if (distance == dice[1] && !diceUsed[1]) {
-            diceUsed[1] = true;
-        }
+        if (distance == dice[0] && !diceUsed[0]) diceUsed[0] = true;
+        else if (distance == dice[1] && !diceUsed[1]) diceUsed[1] = true;
 
         board.movePiece(from, to, currentPlayer);
         return true;
@@ -82,7 +76,6 @@ public class GameLogic implements Serializable {
     public boolean canEnterFromBar(int diceValue) {
         int entryPoint = getBarEntryPoint(currentPlayer, diceValue);
         Point point = board.getPoint(entryPoint);
-
         return point.getCount() < 2 || point.getOwner() == currentPlayer;
     }
 
@@ -122,7 +115,6 @@ public class GameLogic implements Serializable {
             if (board.getPoint(i).getOwner() == currentPlayer) {
                 int to1 = currentPlayer == 0 ? i + dice[0] : i - dice[0];
                 int to2 = currentPlayer == 0 ? i + dice[1] : i - dice[1];
-
                 if (to1 >= 0 && to1 < 24 && isValidMove(i, to1)) return true;
                 if (to2 >= 0 && to2 < 24 && isValidMove(i, to2)) return true;
             }
@@ -138,9 +130,7 @@ public class GameLogic implements Serializable {
         for (int i = 0; i < Board.POINT_COUNT; i++) {
             if (i < start || i >= end) {
                 Point p = board.getPoint(i);
-                if (p.getOwner() == playerId && p.getCount() > 0) {
-                    return false;
-                }
+                if (p.getOwner() == playerId && p.getCount() > 0) return false;
             }
         }
         return true;
@@ -158,23 +148,17 @@ public class GameLogic implements Serializable {
         } else if (!diceUsed[1] && dice[1] == distance + 1) {
             diceUsed[1] = true;
             diceVal = dice[1];
-        } else if (!diceUsed[0] && dice[0] > distance + 1) {
-            if (isHighestPoint(from)) {
-                diceUsed[0] = true;
-                diceVal = dice[0];
-            }
-        } else if (!diceUsed[1] && dice[1] > distance + 1) {
-            if (isHighestPoint(from)) {
-                diceUsed[1] = true;
-                diceVal = dice[1];
-            }
+        } else if (!diceUsed[0] && dice[0] > distance + 1 && isHighestPoint(from)) {
+            diceUsed[0] = true;
+            diceVal = dice[0];
+        } else if (!diceUsed[1] && dice[1] > distance + 1 && isHighestPoint(from)) {
+            diceUsed[1] = true;
+            diceVal = dice[1];
         }
 
         if (diceVal != -1) {
             board.getPoint(from).decreaseCount();
-            if (board.getPoint(from).getCount() == 0) {
-                board.getPoint(from).setOwner(-1);
-            }
+            if (board.getPoint(from).getCount() == 0) board.getPoint(from).setOwner(-1);
             board.bearOff(currentPlayer);
             return true;
         }

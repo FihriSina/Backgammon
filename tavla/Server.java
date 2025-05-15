@@ -1,7 +1,4 @@
-package tavla.sunucu;
-
-import tavla.oyunMantigi.GameLogic;
-import tavla.mesajlasma.Message;
+package tavla;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -17,15 +14,12 @@ public class Server {
         System.out.println("Tavla Server başlatılıyor...");
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server " + PORT + " portunda dinleniyor...");
-
             while (true) {
                 Socket socket = serverSocket.accept();
                 SClient client = new SClient(socket, clients.size(), game, clients);
                 clients.add(client);
                 client.start();
             }
-
         } catch (IOException e) {
             System.err.println("Sunucu hatası: " + e.getMessage());
         }

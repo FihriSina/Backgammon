@@ -1,7 +1,4 @@
-package tavla.istemci;
-
-import tavla.mesajlasma.Message;
-
+package tavla;
 
 import java.io.*;
 import java.net.Socket;
@@ -34,8 +31,7 @@ public class Client {
                                 System.out.println("[Zarlar] " + Arrays.toString((int[]) msg.getData()));
                                 break;
                             case UPDATE:
-                                System.out.println("[Tahta Güncellendi] Yeni durum alındı.");
-                                // İsteğe bağlı: Tahtayı yazdırabilirsiniz
+                                System.out.println("[Tahta Güncellendi]");
                                 break;
                         }
                     }

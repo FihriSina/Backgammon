@@ -1,17 +1,18 @@
-package tavla.oyunMantigi;
+package tavla;
 
 import java.io.Serializable;
 
 public class Board implements Serializable {
+
     public static final int POINT_COUNT = 24;
     private Point[] points;
-    private int[] bar;
-    private int[] bearOff;
+    private int[] bar;        // [0] oyuncu 0, [1] oyuncu 1
+    private int[] bearOff;    // Çıkartılmış taşlar
 
     public Board() {
         points = new Point[POINT_COUNT];
         for (int i = 0; i < POINT_COUNT; i++) {
-            points[i] = new Point(0, -1);
+            points[i] = new Point(0, -1); // boş hane
         }
 
         bar = new int[2];
@@ -21,11 +22,13 @@ public class Board implements Serializable {
     }
 
     private void initializeBoard() {
+        // Oyuncu 0 taşları
         points[0] = new Point(2, 0);
         points[11] = new Point(5, 0);
         points[16] = new Point(3, 0);
         points[18] = new Point(5, 0);
 
+        // Oyuncu 1 taşları
         points[23] = new Point(2, 1);
         points[12] = new Point(5, 1);
         points[7]  = new Point(3, 1);
@@ -59,14 +62,14 @@ public class Board implements Serializable {
         return bar[playerId];
     }
 
+    public void addToBar(int playerId) {
+        bar[playerId]++;
+    }
+
     public void removeFromBar(int playerId) {
         if (bar[playerId] > 0) {
             bar[playerId]--;
         }
-    }
-
-    public void addToBar(int playerId) {
-        bar[playerId]++;
     }
 
     public int getBearOffCount(int playerId) {

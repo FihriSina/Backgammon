@@ -1,9 +1,8 @@
-package tavla.mesajlasma;
+package tavla;
 
 import java.io.Serializable;
 
 public class Message implements Serializable {
-
     public enum MessageType {
         CONNECT,
         ROLL_DICE,
