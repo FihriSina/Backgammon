@@ -1,4 +1,5 @@
-package tavla;
+package tavla.oyunMantigi;
+
 
 import java.io.Serializable;
 import java.util.Random;

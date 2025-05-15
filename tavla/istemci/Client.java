@@ -1,4 +1,7 @@
-package tavla;
+package tavla.istemci;
+
+import tavla.mesajlasma.Message;
+
 
 import java.io.*;
 import java.net.Socket;

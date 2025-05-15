@@ -1,4 +1,8 @@
-package tavla;
+package tavla.sunucu;
+
+import tavla.oyunMantigi.GameLogic;
+import tavla.mesajlasma.Message;
+
 
 import java.io.*;
 import java.net.Socket;
