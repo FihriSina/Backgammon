@@ -1,32 +1,94 @@
-// Proje: Tavla Oyunu (Ağ Üzerinden)
-// Adım 1: Klasör ve Temel Sınıf Yapısı
-
-// server/TavlaServer.java
 package server;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import protocol.Message;
 
 public class TavlaServer {
-    public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(5000);
-        System.out.println("Tavla sunucusu başlatıldı. Bekleniyor...");
+    private ServerSocket serverSocket;
+    private List<ClientHandler> clients;
 
-        Socket player1 = serverSocket.accept();
-        System.out.println("Oyuncu 1 bağlandı: " + player1.getInetAddress());
+    public TavlaServer(int port) throws IOException {
+        serverSocket = new ServerSocket(port);
+        clients = new ArrayList<>();
+        System.out.println("Tavla Server " + port + " portunda başladı.");
+    }
 
-        Socket player2 = serverSocket.accept();
-        System.out.println("Oyuncu 2 bağlandı: " + player2.getInetAddress());
+    public void start() {
+        try {
+            while (true) {
+                Socket clientSocket = serverSocket.accept(); // Yeni oyuncu bağlanıyor
+                ClientHandler handler = new ClientHandler(clientSocket, this);
+                clients.add(handler);
+                handler.start();
+                System.out.println("Yeni oyuncu bağlandı: " + clientSocket.getInetAddress());
+            }
+        } catch (IOException e) {
+            System.out.println("Sunucu kapandı.");
+        }
+    }
 
-        // Oyunculara "oyun başlıyor" mesajı gönder
-        PrintWriter out1 = new PrintWriter(player1.getOutputStream(), true);
-        PrintWriter out2 = new PrintWriter(player2.getOutputStream(), true);
+    // Mesajı diğer oyunculara gönder
+    public synchronized void broadcast(String message, ClientHandler sender) {
+        for (ClientHandler client : clients) {
+            if (client != sender) {
+                client.sendMessage(message);
+            }
+        }
+    }
 
-        out1.println("Oyun başlıyor. Sen Oyuncu 1'sin.");
-        out2.println("Oyun başlıyor. Sen Oyuncu 2'sin.");
+    // Sunucu programının ana noktası
+    public static void main(String[] args) {
+        try {
+            TavlaServer server = new TavlaServer(5000);
+            server.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-        // Gelecek: oyun mantığı, mesaj dinleme, yönlendirme
-        serverSocket.close();
+    // Her oyuncuyu ayrı thread'de yönetecek iç sınıf
+    class ClientHandler extends Thread {
+        private Socket socket;
+        private TavlaServer server;
+        private BufferedReader in;
+        private PrintWriter out;
+
+        public ClientHandler(Socket socket, TavlaServer server) throws IOException {
+            this.socket = socket;
+            this.server = server;
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+        }
+
+        public void sendMessage(String message) {
+            out.println(message);
+        }
+
+        public void run() {
+            try {
+                String message;
+                while ((message = in.readLine()) != null) {
+                    System.out.println("Sunucu aldı: " + message);
+
+                    // Mesajı protokol üzerinden analiz edebiliriz
+                    Message.ParsedMessage parsed = Message.parse(message);
+
+                    // Burada oyun mantığına göre mesaj işlenir
+                    // Şimdilik sadece diğer oyunculara gönderiyoruz
+                    server.broadcast(message, this);
+                }
+            } catch (IOException e) {
+                System.out.println("Bir oyuncu bağlantısını kaybetti.");
+            } finally {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                server.clients.remove(this);
+            }
+        }
     }
 }
