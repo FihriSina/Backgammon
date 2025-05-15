@@ -2,12 +2,10 @@ package tavla.istemci;
 
 import tavla.mesajlasma.Message;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class GUIClient extends JFrame {
     private JLabel boardLabel;
@@ -30,7 +28,7 @@ public class GUIClient extends JFrame {
         boardLabel.setBounds(0, 0, 900, 500);
         add(boardLabel);
 
-        // Tahta üzerindeki hane butonları (görünmez)
+        // 24 görünmez point button'ı
         for (int i = 0; i < 24; i++) {
             JButton pointButton = new JButton();
             pointButton.setBounds(getXForPoint(i), getYForPoint(i), 30, 30);

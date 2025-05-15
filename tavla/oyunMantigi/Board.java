@@ -1,14 +1,12 @@
 package tavla.oyunMantigi;
 
-
 import java.io.Serializable;
 
 public class Board implements Serializable {
-
     public static final int POINT_COUNT = 24;
     private Point[] points;
-    private int[] bar;        // Bar'daki taşlar [0] oyuncu0, [1] oyuncu1
-    private int[] bearOff;    // Oyundan çıkarılan taş sayısı
+    private int[] bar;
+    private int[] bearOff;
 
     public Board() {
         points = new Point[POINT_COUNT];
@@ -23,13 +21,11 @@ public class Board implements Serializable {
     }
 
     private void initializeBoard() {
-        // Oyuncu 0
         points[0] = new Point(2, 0);
         points[11] = new Point(5, 0);
         points[16] = new Point(3, 0);
         points[18] = new Point(5, 0);
 
-        // Oyuncu 1
         points[23] = new Point(2, 1);
         points[12] = new Point(5, 1);
         points[7]  = new Point(3, 1);

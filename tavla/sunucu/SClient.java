@@ -3,7 +3,6 @@ package tavla.sunucu;
 import tavla.oyunMantigi.GameLogic;
 import tavla.mesajlasma.Message;
 
-
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
@@ -33,6 +32,8 @@ public class SClient extends Thread {
 
             Message msg;
             while ((msg = (Message) input.readObject()) != null) {
+                System.out.println("[" + msg.getType() + "] from: " + clientId + " data: " + msg.getData());
+
                 switch (msg.getType()) {
                     case ROLL_DICE:
                         if (game.getCurrentPlayer() == clientId) {
@@ -42,7 +43,7 @@ public class SClient extends Thread {
                         break;
 
                     case MOVE:
-                        int[] move = (int[]) msg.getData(); // [from, to]
+                        int[] move = (int[]) msg.getData();
                         boolean moved = game.move(move[0], move[1]);
                         broadcast(new Message(Message.MessageType.UPDATE, clientId, game.getBoard()));
                         break;
@@ -74,7 +75,7 @@ public class SClient extends Thread {
                         break;
 
                     case CHAT:
-                        broadcast(msg); // sohbet mesajlarını olduğu gibi yay
+                        broadcast(msg);
                         break;
 
                     default:

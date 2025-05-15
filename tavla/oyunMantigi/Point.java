@@ -1,11 +1,10 @@
 package tavla.oyunMantigi;
 
-
 import java.io.Serializable;
 
 public class Point implements Serializable {
-    private int count;     // Hane üzerindeki taş sayısı
-    private int owner;     // 0 = oyuncu0, 1 = oyuncu1, -1 = boş
+    private int count;
+    private int owner;
 
     public Point(int count, int owner) {
         this.count = count;
