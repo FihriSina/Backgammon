@@ -1,4 +1,4 @@
-package tavla;
+package tavla.mesajlasma;
 
 import java.io.Serializable;
 
