@@ -87,7 +87,7 @@ public class Client extends JFrame {
     public static void main(String[] args) {
         //GUI BAŞLIOR -- AWS IP
         SwingUtilities.invokeLater(() -> {
-            Client client = new Client("34.140.188.56", 5000); // AWS SERVER IP BURADA | ec2-3-83-123-45.compute-1.amazonaws.com
+            Client client = new Client("127.0.0.1", 5000); // SERVER IP BURADA | 104.199.56.156
             client.setVisible(true); // Pencereyi görünür yap
         });
     }
