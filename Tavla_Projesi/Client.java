@@ -8,9 +8,19 @@ import java.net.*;
 
 public class Client extends JFrame {
 
+    private JButton[] boardButtons = new JButton[24]; // 24 nokta
+    private int selectedPoint = -1; // Seçilen taşın konumu
+
     private JTextField userInputField;
     private JTextArea chatArea;
     private JButton sendButton;
+
+    private JLabel diceLabel1, diceLabel2;
+    private JButton rollDiceButton;
+    private JPanel boardPanel;
+    private int playerId = -1;
+    private boolean myTurn = false;
+
     private Socket socket;
     private BufferedReader input;
     private PrintWriter output;
@@ -43,6 +53,26 @@ public class Client extends JFrame {
 
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         
+        // Zar bilgisi paneli
+        JPanel dicePanel = new JPanel();
+        diceLabel1 = new JLabel("Zar 1: -");
+        diceLabel2 = new JLabel("Zar 2: -");
+        rollDiceButton = new JButton("Zar At");
+        rollDiceButton.setEnabled(false); // Sırası gelmeyene pasif
+
+        dicePanel.add(diceLabel1);
+        dicePanel.add(diceLabel2);
+        dicePanel.add(rollDiceButton);
+
+        add(dicePanel, BorderLayout.NORTH);
+
+        // Zar At butonu işlevi
+        rollDiceButton.addActionListener(e -> {
+            if (myTurn) {
+                output.println("roll_dice"); // Server’a zar at komutu gönder
+            }
+        });
+
         // Butona basıldığında mesaj gönderme
         sendButton.addActionListener(e -> sendMessage());     // Butona tıklandığında mesaj gönderme
         userInputField.addActionListener(e -> sendMessage()); // Enter tuşuna basıldığında mesaj gönderme
@@ -61,18 +91,141 @@ public class Client extends JFrame {
                 try {
                     String messageFromServer;
                     while ((messageFromServer = input.readLine()) != null) {
-                        chatArea.append("Server: " + messageFromServer + "\n"); // Server'dan gelen mesajı göster
+                        
+                        if (messageFromServer.equals("SIRA")) {
+                            myTurn = true;
+                            rollDiceButton.setEnabled(true);
+                            chatArea.append("Sıra sizde! Zar atabilirsiniz.\n");
+                            continue;
+                        }
+
+                        if (messageFromServer.startsWith("TAHTA:")) {
+                            String boardData = messageFromServer.substring(6);
+                            updateBoardFromString(boardData);
+                            continue;
+                        }
+
+                        if (messageFromServer.startsWith("TAHTA:")) {
+                            String boardData = messageFromServer.substring(6);
+                            updateBoardFromString(boardData);
+                            continue;
+                        }
+
+                        if (messageFromServer.startsWith("ZARLAR:")) {
+                            // Örn: ZARLAR:3,5
+                            String[] parts = messageFromServer.substring(7).split(",");
+                            int d1 = Integer.parseInt(parts[0]);
+                            int d2 = Integer.parseInt(parts[1]);
+                            diceLabel1.setText("Zar 1: " + d1);
+                            diceLabel2.setText("Zar 2: " + d2);
+                            myTurn = true; // kendi sırası geldi
+                            rollDiceButton.setEnabled(false); // zar zaten atıldı
+                            chatArea.append("Zarlarınız geldi: " + d1 + " ve " + d2 + "\n");
+                            continue;
+                        }
+
+                        if (messageFromServer.startsWith("RAKIP_ZAR:")) {
+                            String[] parts = messageFromServer.substring(10).split(",");
+                            int d1 = Integer.parseInt(parts[0]);
+                            int d2 = Integer.parseInt(parts[1]);
+                            diceLabel1.setText("Rakip Zar 1: " + d1);
+                            diceLabel2.setText("Rakip Zar 2: " + d2);
+                            myTurn = false; // sırası bizde değil
+                            rollDiceButton.setEnabled(false);
+                            chatArea.append("Rakip zar attı: " + d1 + " ve " + d2 + "\n");
+                            continue;
+                        }
+
+                        // Diğer normal mesajlar
+                        chatArea.append("Server: " + messageFromServer + "\n");
                     }
                 } catch (IOException e) {
-                    chatArea.append("Server bağlantısı Gitti.\n");
+                    chatArea.append("Server bağlantısı gitti.\n");
                 }
-            }).start(); // Thread başlat
+            }).start();
+
 
         }catch (IOException ex) {
             chatArea.append("Server'a bağlanamadı: " + ex.getMessage() + "\n");
         }
+        
+        // TAHTA PANELİ
+        boardPanel = new JPanel(new GridLayout(2, 12)); // 2 satır 12 sütun = 24 nokta
+        for (int i = 0; i < 24; i++) {
+            JButton pointButton = new JButton("Nokta " + i);
+            int pointIndex = i;
+    
+            pointButton.addActionListener(e -> handlePointClick(pointIndex));
+            boardButtons[i] = pointButton;
+            boardPanel.add(pointButton);
+        }
+
+        add(boardPanel, BorderLayout.EAST); // Sağa yerleştirdik
+
+        // TEST AMAÇLI TAŞ EKLEME
+        boardButtons[0].setText("●●●");        // Oyuncu 1 taşları
+        boardButtons[23].setText("●●●●●");     // Oyuncu 2 taşları
 
     }
+
+    private void updateBoard(int[][] board) {
+        for (int i = 0; i < 24; i++) {
+            int count = board[i][0];
+            int owner = board[i][1];
+
+            if (count == 0) {
+                boardButtons[i].setText("Nokta " + i);
+            } else {
+                String stones = "";
+                for (int j = 0; j < count; j++) {
+                    stones += (owner == playerId) ? "●" : "○";
+                }
+                boardButtons[i].setText(stones);
+            }
+        }
+    }   
+
+    private void updateBoardFromString(String data) {
+        String[] points = data.split(";");
+        for (int i = 0; i < 24; i++) {
+            String[] parts = points[i].split(",");
+            int count = Integer.parseInt(parts[0]);
+            int owner = Integer.parseInt(parts[1]);
+
+            if (count == 0) {
+                boardButtons[i].setText("Nokta " + i);
+            } else {
+                String stones = "";
+                for (int j = 0; j < count; j++) {
+                    stones += (owner == playerId) ? "●" : "○";
+                }
+                boardButtons[i].setText(stones);
+            }
+        }
+    }
+
+
+
+    private void handlePointClick(int pointIndex) {
+        if (!myTurn) {
+            chatArea.append("Sıra sizde değil.\n");
+            return;
+        }
+
+        if (selectedPoint == -1) {
+            selectedPoint = pointIndex;
+            chatArea.append("Taş seçildi: Nokta " + pointIndex + "\n");
+        } else {
+            // Burada taş taşıma işlemi yapılabilir
+            chatArea.append("Hamle: " + selectedPoint + " -> " + pointIndex + "\n");
+
+            // Server’a hamle gönder (ileride kullanılacak)
+            output.println("move:" + selectedPoint + "->" + pointIndex);
+
+            selectedPoint = -1; // sıfırla
+        }
+}
+
 
     // Mesaj gönderme fonksiyonu
     private void sendMessage() {
