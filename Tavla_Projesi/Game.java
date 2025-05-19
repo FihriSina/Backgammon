@@ -18,6 +18,7 @@ public class Game {
         board = new int[24][2]; // [taş sayısı, oyuncu numara]
         random = new Random();
         currentPlayer = 1; // Oyuna 1. oyuncu başlasın
+        initializeBoard();
     }
 
     // Başlangıç pozisyounu
@@ -52,40 +53,42 @@ public class Game {
         return sb.toString();
     }
 
-
     // Hamle gerçekleştirme Fonksiyonu 
-    public boolean movePiece(int from, int diceValue) {
-        int to = currentPlayer == 1 ? from + diceValue : from - diceValue; // Oyuncu 1 ise sola, 2 ise sağa
-
-        // Tahta Sınır Kontrol
-        if(to < 0 || to >= 24) {
-            System.out.println("Tahta Sınırının Dışındasın Kardeş, Nereye gidiysun Gülüm");
+    public boolean movePiece(int from, int to, int playerId, int zar1, int zar2) {
+        // 1. Taş gerçekten orada mı?
+        if (board[from][0] == 0 || board[from][1] != playerId) {
             return false;
         }
 
-        // Başlangıç Pozisyonunda Taşın var mı ki
-        if(board[from][0] == 0 || board[from][1] != currentPlayer) {
-            System.out.println("Başlangıç Pozisyonunda Taşın yok ki, Nereye gidiysun Gülüm");
+        // 2. Hedef nokta geçerli mi?
+        if (to < 0 || to >= 24) {
             return false;
         }
 
-        // Gideceği yer boş yada aynı kardeşin taşı olmalı
-        if(board[to][0] > 0 && board[to][1] != currentPlayer) {
-            System.out.println("Gideceğin yerde karşı kardeş var, Nereye gidiysun Gülüm");
+        // 3. Rakip taşı varsa (ileride kırma gelecek), şimdilik engelle
+        if (board[to][0] > 0 && board[to][1] != playerId) {
             return false;
         }
 
-        // Hamleyi Uygula
-        board[from][0]--; // Başlangıç pozisyonundaki taş sayısını azalt
-        if(board[from][0] == 0) board[from][1] = 0; // Başlangıç pozisyonu boşsa oyuncu numarasını sıfırla
+        // 4. Zar mesafesi uygun mu?
+        int fark = Math.abs(to - from);
+        if (fark != zar1 && fark != zar2) {
+            return false;
+        }
 
-        if (board[to][0] == 0) board[to][1] = currentPlayer; // Gideceği yer boşsa oyuncu numarasını ata
-        board[to][0]++; // Gideceği yerin taş sayısını artır
+        // 5. Hamleyi uygula
+        board[from][0]--;
+        if (board[from][0] == 0) {
+            board[from][1] = 0; // orası artık boş
+        }
 
-        System.out.println("Oyuncu " + currentPlayer + ": " + from + " -> " + to);
+        if (board[to][0] == 0) {
+            board[to][1] = playerId; // boş yere ilk taşı koy
+        }
+        board[to][0]++;
+
         return true;
-            
-    } 
+    }
 
     // Oyuncu Sırası Değiştirme
     public void switchPlayer() {

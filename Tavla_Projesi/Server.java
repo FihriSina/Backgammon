@@ -126,49 +126,80 @@ class ClientHandler implements Runnable {
         try {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(socket.getOutputStream(), true);
-
+        
             output.println("Sunucuya bağlandınız. Oyuncu ID'niz: " + playerId);
-
-            // Gelen mesajları dinle (şimdilik sadece loglama için)
+        
             String message;
             while ((message = input.readLine()) != null) {
                 System.out.println("Oyuncu " + playerId + ": " + message);
-
+            
+                // Zar atma isteği
                 if (message.equals("roll_dice")) {
+                    if (playerId != Server.game.getCurrentPlayer()) {
+                        sendMessage("Sıra sizde değil, zar atamazsınız.");
+                        continue;
+                    }
                 
-                    // Sadece sırası gelen oyuncudan gelmişse işlem yapılmalı (bu kısmı senin game loop'a bağlayacağız)
                     Server.game.rollDice();
                     int d1 = Server.game.getDice1();
                     int d2 = Server.game.getDice2();
-                    // Zarları atan oyuncuya ve diğerine mesaj gönder
-                    for (ClientHandler client : Server.getClients()) {
-                        if (client.getPlayerId() == this.playerId) {
-                            client.sendMessage("ZARLAR:" + d1 + "," + d2);
+                
+                    for (ClientHandler c : Server.getClients()) {
+                        if (c.getPlayerId() == playerId) {
+                            c.sendMessage("ZARLAR:" + d1 + "," + d2);
                         } else {
-                            client.sendMessage("RAKIP_ZAR:" + d1 + "," + d2);
+                            c.sendMessage("RAKIP_ZAR:" + d1 + "," + d2);
                         }
-                        client.sendMessage("TAHTA:" + Server.game.serializeBoard());
+                        c.sendMessage("TAHTA:" + Server.game.serializeBoard());
                     }
-                    Server.game.switchPlayer();
-
-                    // Yeni oyuncuya sırayı gönder
-                    for (ClientHandler client : Server.getClients()) {
-                        if (client.getPlayerId() == Server.game.getCurrentPlayer()) {
-                            client.sendMessage("SIRA");
-                        }
-                    }
-
+                
                     continue;
                 }
-
-                // Mesajı tüm bağlı clientlara gönder (broadcast)
+            
+                // Taş hamlesi
+                if (message.startsWith("move:")) {
+                    if (playerId != Server.game.getCurrentPlayer()) {
+                        sendMessage("Sıra sizde değil, hamle yapamazsınız.");
+                        continue;
+                    }
+                
+                    String[] parts = message.substring(5).split("->");
+                    int from = Integer.parseInt(parts[0]);
+                    int to = Integer.parseInt(parts[1]);
+                
+                    int d1 = Server.game.getDice1();
+                    int d2 = Server.game.getDice2();
+                
+                    boolean success = Server.game.movePiece(from, to, playerId, d1, d2);
+                    if (!success) {
+                        sendMessage("Geçersiz hamle! Kurallara uymuyor.");
+                        continue;
+                    }
+                
+                    // Tahta güncelle ve sırayı değiştir
+                    for (ClientHandler c : Server.getClients()) {
+                        c.sendMessage("TAHTA:" + Server.game.serializeBoard());
+                    }
+                
+                    Server.game.switchPlayer();
+                
+                    for (ClientHandler c : Server.getClients()) {
+                        if (c.getPlayerId() == Server.game.getCurrentPlayer()) {
+                            c.sendMessage("SIRA");
+                        }
+                    }
+                
+                    continue;
+                }
+            
+                // Diğer her mesaj (sohbet gibi) herkese yayınla
                 synchronized (Server.class) {
-                    for (ClientHandler client : Server.getClients()) {   
-                        client.sendMessage("Oyuncu " + playerId + ": " + message);     
+                    for (ClientHandler client : Server.getClients()) {
+                        client.sendMessage("Oyuncu " + playerId + ": " + message);
                     }
                 }
             }
-
+        
         } catch (IOException e) {
             System.err.println("İstemci hatası (Oyuncu " + playerId + "): " + e.getMessage());
         } finally {
@@ -179,5 +210,5 @@ class ClientHandler implements Runnable {
                 System.err.println("Bağlantı kapatma hatası.");
             }
         }
-    }
+    }  
 }

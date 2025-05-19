@@ -25,6 +25,10 @@ public class Client extends JFrame {
     private BufferedReader input;
     private PrintWriter output;
 
+    private int zar1 = -1;
+    private int zar2 = -1;
+
+
     public Client(String serverIP, int serverPort) {
         
         //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -118,6 +122,9 @@ public class Client extends JFrame {
                             int d2 = Integer.parseInt(parts[1]);
                             diceLabel1.setText("Zar 1: " + d1);
                             diceLabel2.setText("Zar 2: " + d2);
+                            zar1 = d1;
+                            zar2 = d2;
+
                             myTurn = true; // kendi sırası geldi
                             rollDiceButton.setEnabled(false); // zar zaten atıldı
                             chatArea.append("Zarlarınız geldi: " + d1 + " ve " + d2 + "\n");
@@ -216,15 +223,23 @@ public class Client extends JFrame {
             selectedPoint = pointIndex;
             chatArea.append("Taş seçildi: Nokta " + pointIndex + "\n");
         } else {
-            // Burada taş taşıma işlemi yapılabilir
-            chatArea.append("Hamle: " + selectedPoint + " -> " + pointIndex + "\n");
+            // Zar değerine göre geçerli mi kontrol et
+            int expectedTo1 = selectedPoint + zar1;
+            int expectedTo2 = selectedPoint + zar2;
 
-            // Server’a hamle gönder (ileride kullanılacak)
+            if (pointIndex != expectedTo1 && pointIndex != expectedTo2) {
+                chatArea.append("Zar değerlerine uygun hamle yapmalısınız.\n");
+                selectedPoint = -1;
+                return;
+            }
+
+            chatArea.append("Hamle: " + selectedPoint + " -> " + pointIndex + "\n");
             output.println("move:" + selectedPoint + "->" + pointIndex);
 
-            selectedPoint = -1; // sıfırla
+            selectedPoint = -1;
         }
-}
+    }
+
 
 
     // Mesaj gönderme fonksiyonu
