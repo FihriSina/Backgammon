@@ -28,6 +28,9 @@ public class Client extends JFrame {
     private int zar1 = -1;
     private int zar2 = -1;
 
+    private int[] bar = new int[3]; // bar[1]: oyuncu 1, bar[2]: oyuncu 2
+
+    private JLabel barLabel;
 
     public Client(String serverIP, int serverPort) {
         
@@ -70,6 +73,10 @@ public class Client extends JFrame {
 
         add(dicePanel, BorderLayout.NORTH);
 
+        barLabel = new JLabel("Bar: -"); // ilk değer
+        add(barLabel, BorderLayout.WEST);
+
+
         // Zar At butonu işlevi
         rollDiceButton.addActionListener(e -> {
             if (myTurn) {
@@ -108,10 +115,11 @@ public class Client extends JFrame {
                             continue;
                         }
 
-                        if (messageFromServer.startsWith("TAHTA:")) {
-                            String boardData = messageFromServer.substring(6);
-                            updateBoardFromString(boardData);
-                            continue;
+                        if (messageFromServer.startsWith("OYUN_BITTI:")) {
+                            chatArea.append("🎉 " + messageFromServer + "\n");
+                            rollDiceButton.setEnabled(false);
+                            myTurn = false;
+                            return;
                         }
 
                         if (messageFromServer.startsWith("TAHTA:")) {
@@ -202,6 +210,15 @@ public class Client extends JFrame {
             if (playerId == -1) return; // Oyuncu ID henüz belirlenmediyse çık
         
             String[] points = data.split(";");
+            // Bar verisi varsa ayır
+            String barInfo = "";
+            if (data.contains("|BAR:")) {
+                String[] split = data.split("\\|BAR:");
+                data = split[0];
+                barInfo = split[1];
+                points = data.split(";"); // yeniden güncelle!
+            }
+        
             for (int i = 0; i < 24; i++) {
                 String[] parts = points[i].split(",");
                 int count = Integer.parseInt(parts[0]);
@@ -218,40 +235,79 @@ public class Client extends JFrame {
                         stones += (owner == playerId) ? ownSymbol : opponentSymbol;
                     }
                 
-                    boardButtons[i].setText(stones); // <-- artık doğru yerde
+                    boardButtons[i].setText(stones);
+                }
+            }
+        
+            // ⬇️ Bar verisi varsa göster
+            if (!barInfo.isEmpty()) {
+
+                String ownSymbol = (playerId == 1) ? "●" : "○";
+                int ownBarCount = bar[playerId];
+                StringBuilder barStones = new StringBuilder("Bar: ");
+                for (int i = 0; i < ownBarCount; i++) {
+                    barStones.append(ownSymbol);
+                }
+                barLabel.setText(barStones.toString());
+                
+                String[] barParts = barInfo.split(",");
+                bar[1] = Integer.parseInt(barParts[0]);
+                bar[2] = Integer.parseInt(barParts[1]);
+            
+                if (bar[playerId] > 0) {
+                    chatArea.append("Bar'da taşınız var. Önce onu tahtaya çıkarmalısınız.\n");
                 }
             }
         }
 
-
-
-
-    private void handlePointClick(int pointIndex) {
-        if (!myTurn) {
-            chatArea.append("Sıra sizde değil.\n");
-            return;
-        }
-
-        if (selectedPoint == -1) {
-            selectedPoint = pointIndex;
-            chatArea.append("Taş seçildi: Nokta " + pointIndex + "\n");
-        } else {
-            // Zar değerine göre geçerli mi kontrol et
-            int expectedTo1 = selectedPoint + zar1;
-            int expectedTo2 = selectedPoint + zar2;
-
-            if (pointIndex != expectedTo1 && pointIndex != expectedTo2) {
-                chatArea.append("Zar değerlerine uygun hamle yapmalısınız.\n");
-                selectedPoint = -1;
+        private void handlePointClick(int pointIndex) {
+            // 1. Sıra kontrolü
+            if (!myTurn) {
+                chatArea.append("Sıra sizde değil.\n");
+                return;
+            }
+        
+            // 2. Bar'dan çıkma durumu
+            if (bar[playerId] > 0) {
+                // Bar’dan çıkış için taş seçilmeden doğrudan hedef seçilecek
+                int hedefNokta = pointIndex;
+            
+                // Hedef nokta zarla uyumlu mu?
+                int beklenen = (playerId == 1) ? zar1 - 1 : 24 - zar1;
+                int beklenen2 = (playerId == 1) ? zar2 - 1 : 24 - zar2;
+            
+                if (hedefNokta != beklenen && hedefNokta != beklenen2) {
+                    chatArea.append("Zar değeriyle bar'dan bu noktaya çıkılamaz.\n");
+                    return;
+                }
+            
+                // Bar’dan hamle gönder: from == -1
+                output.println("move:-1->" + hedefNokta);
+                chatArea.append("Bar'dan çıkış hamlesi gönderildi: -> Nokta " + hedefNokta + "\n");
                 return;
             }
 
-            chatArea.append("Hamle: " + selectedPoint + " -> " + pointIndex + "\n");
-            output.println("move:" + selectedPoint + "->" + pointIndex);
-
-            selectedPoint = -1;
+        
+            // 3. Normal taş seçimi ve hamlesi
+            if (selectedPoint == -1) {
+                selectedPoint = pointIndex;
+                chatArea.append("Taş seçildi: Nokta " + pointIndex + "\n");
+            } else {
+                int expectedTo1 = selectedPoint + zar1;
+                int expectedTo2 = selectedPoint + zar2;
+            
+                if (pointIndex != expectedTo1 && pointIndex != expectedTo2) {
+                    chatArea.append("Zar değerlerine uygun hamle yapmalısınız.\n");
+                    selectedPoint = -1;
+                    return;
+                }
+            
+                chatArea.append("Hamle: " + selectedPoint + " -> " + pointIndex + "\n");
+                output.println("move:" + selectedPoint + "->" + pointIndex);
+                selectedPoint = -1;
+            }
         }
-    }
+
 
 
 

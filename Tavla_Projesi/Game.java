@@ -16,7 +16,8 @@ public class Game {
     // Zar kullanma durumunu kontrol ediyorum
     private boolean zar1Used = false;
     private boolean zar2Used = false;
-
+    
+    private int[] bar = new int[3]; // bar[1] → oyuncu 1, bar[2] → oyuncu 2
 
     public Game() {
 
@@ -62,43 +63,106 @@ public class Game {
             sb.append(board[i][0]).append(",").append(board[i][1]);
             if (i < 23) sb.append(";");
         }
+        sb.append("|BAR:").append(bar[1]).append(",").append(bar[2]);
+
         return sb.toString();
     }
 
     // Hamle gerçekleştirme Fonksiyonu 
     public boolean movePiece(int from, int to, int playerId, int zar1, int zar2) {
-        // Oyuncuya ait mi?
+
+        // Bar'da taş varsa önce onu oyna
+        if (bar[playerId] > 0) {
+
+            int fark = (playerId == 1) ? to : 23 - to; // zar ile kıyaslanacak mesafe
+            if (fark == zar1 && !zar1Used) {
+                zar1Used = true;
+            } else if (fark == zar2 && !zar2Used) {
+                zar2Used = true;
+            } else {
+                return false; // geçersiz zar
+            }
+            
+
+            boolean barExit = (playerId == 1) ? to <= 5 : to >= 18;
+            if (!barExit || from != -1) return false;
+
+            if (board[to][0] > 1 && board[to][1] != playerId) return false;
+
+            // Rakip taş varsa ve yalnızsa → kır
+            if (board[to][0] == 1 && board[to][1] != playerId) {
+                int rakip = board[to][1];
+                bar[rakip]++;
+                board[to][0] = 0;
+                board[to][1] = 0;
+            }
+
+            bar[playerId]--;
+            board[to][0]++;
+            board[to][1] = playerId;
+            return true;
+        }
+
+        // Hedef geçerli mi?
+        if (from < 0 || to < 0 || from >= 24 || to >= 24) return false;
         if (board[from][0] == 0 || board[from][1] != playerId) return false;
-        
-        // Tahta dışı mı?
-        if (to < 0 || to >= 24) return false;
-        
-        // Rakibin taşına gidilemez (şimdilik)
-        if (board[to][0] > 0 && board[to][1] != playerId) return false;
-        
-        // Zar değerine göre mi oynuyor?
+        if (board[to][0] > 1 && board[to][1] != playerId) return false;
+
+        // Zar kontrolü
         int fark = Math.abs(to - from);
-        
         if (fark == zar1 && !zar1Used) {
             zar1Used = true;
         } else if (fark == zar2 && !zar2Used) {
             zar2Used = true;
         } else {
-            return false; // Zarlarla uyumsuz
+            return false;
         }
-    
+
+        // Rakip taşı varsa ve yalnızsa → kır
+        if (board[to][0] == 1 && board[to][1] != playerId) {
+            int rakip = board[to][1];
+            bar[rakip]++;
+            board[to][0] = 0;
+            board[to][1] = 0;
+        }
+
         // Hamleyi uygula
         board[from][0]--;
         if (board[from][0] == 0) board[from][1] = 0;
-    
+
         if (board[to][0] == 0) board[to][1] = playerId;
         board[to][0]++;
-    
+
         return true;
     }
 
 
 
+    public boolean isGameOver() {
+        // Oyuncu 1 için
+        boolean p1Finished = true;
+        boolean p2Finished = true;
+
+        for (int i = 0; i < 24; i++) {
+            if (board[i][1] == 1 && board[i][0] > 0) {
+                p1Finished = false;
+            }
+            if (board[i][1] == 2 && board[i][0] > 0) {
+                p2Finished = false;
+            }
+        }
+
+        return p1Finished || p2Finished;
+    }
+
+    public int getWinner() {
+        // Bu metot sadece oyun bittiyse çağrılmalı
+        for (int i = 0; i < 24; i++) {
+            if (board[i][1] == 1 && board[i][0] > 0) return 2;
+            if (board[i][1] == 2 && board[i][0] > 0) return 1;
+        }
+        return currentPlayer;
+    }
 
     // Oyuncu Sırası Değiştirme
     public void switchPlayer() {

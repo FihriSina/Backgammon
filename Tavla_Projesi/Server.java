@@ -126,24 +126,24 @@ class ClientHandler implements Runnable {
         try {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(socket.getOutputStream(), true);
-        
+
             output.println("Sunucuya bağlandınız. Oyuncu ID'niz: " + playerId);
-        
+
             String message;
             while ((message = input.readLine()) != null) {
                 System.out.println("Oyuncu " + playerId + ": " + message);
-            
+
                 // Zar atma isteği
                 if (message.equals("roll_dice")) {
                     if (playerId != Server.game.getCurrentPlayer()) {
                         sendMessage("Sıra sizde değil, zar atamazsınız.");
                         continue;
                     }
-                
+
                     Server.game.rollDice();
                     int d1 = Server.game.getDice1();
                     int d2 = Server.game.getDice2();
-                
+
                     for (ClientHandler c : Server.getClients()) {
                         if (c.getPlayerId() == playerId) {
                             c.sendMessage("ZARLAR:" + d1 + "," + d2);
@@ -152,35 +152,44 @@ class ClientHandler implements Runnable {
                         }
                         c.sendMessage("TAHTA:" + Server.game.serializeBoard());
                     }
-                
+
                     continue;
                 }
-            
+
                 // Taş hamlesi
                 if (message.startsWith("move:")) {
                     if (playerId != Server.game.getCurrentPlayer()) {
                         sendMessage("Sıra sizde değil, hamle yapamazsınız.");
                         continue;
                     }
-                
+
                     String[] parts = message.substring(5).split("->");
                     int from = Integer.parseInt(parts[0]);
                     int to = Integer.parseInt(parts[1]);
-                
+
                     int d1 = Server.game.getDice1();
                     int d2 = Server.game.getDice2();
-                
+
                     boolean success = Server.game.movePiece(from, to, playerId, d1, d2);
                     if (!success) {
                         sendMessage("Geçersiz hamle! Kurallara uymuyor.");
                         continue;
                     }
-                
+
                     // Tahta güncelle
                     for (ClientHandler c : Server.getClients()) {
                         c.sendMessage("TAHTA:" + Server.game.serializeBoard());
                     }
-                
+                    
+                    // Oyun bitti mi?
+                    if (Server.game.isGameOver()) {
+                        int winner = Server.game.getWinner();
+                        for (ClientHandler c : Server.getClients()) {
+                            c.sendMessage("OYUN_BITTI: Oyuncu " + winner + " kazandı!");
+                        }
+                        return;
+                    }
+                    
                     // Eğer iki zar da kullanıldıysa sıra geçsin
                     if (Server.game.bothDiceUsed()) {
                         Server.game.switchPlayer();
@@ -190,10 +199,10 @@ class ClientHandler implements Runnable {
                             }
                         }
                     }
-                
+
                     continue; // move işlemi tamamlandı, buradan çık
                 }
-            
+
                 // Diğer mesajlar (sohbet) → tüm clientlara gönder
                 synchronized (Server.class) {
                     for (ClientHandler client : Server.getClients()) {
@@ -201,7 +210,7 @@ class ClientHandler implements Runnable {
                     }
                 }
             }
-        
+
         } catch (IOException e) {
             System.err.println("İstemci hatası (Oyuncu " + playerId + "): " + e.getMessage());
         } finally {
