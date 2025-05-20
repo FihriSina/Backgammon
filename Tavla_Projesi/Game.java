@@ -70,46 +70,50 @@ public class Game {
 
     // Hamle gerçekleştirme Fonksiyonu 
     public boolean movePiece(int from, int to, int playerId, int zar1, int zar2) {
-
-        // Bar'da taş varsa önce onu oyna
+        // 🟠 1. Bar'dan çıkış durumu
         if (bar[playerId] > 0) {
-
-            int fark = (playerId == 1) ? to : 23 - to; // zar ile kıyaslanacak mesafe
-            if (fark == zar1 && !zar1Used) {
-                zar1Used = true;
-            } else if (fark == zar2 && !zar2Used) {
-                zar2Used = true;
-            } else {
-                return false; // geçersiz zar
-            }
-            
-
             boolean barExit = (playerId == 1) ? to <= 5 : to >= 18;
             if (!barExit || from != -1) return false;
-
-            if (board[to][0] > 1 && board[to][1] != playerId) return false;
-
-            // Rakip taş varsa ve yalnızsa → kır
+        
+            int beklenen1 = (playerId == 1) ? zar1 - 1 : 24 - zar1;
+            int beklenen2 = (playerId == 1) ? zar2 - 1 : 24 - zar2;
+        
+            if (to == beklenen1 && !zar1Used) {
+                zar1Used = true;
+            } else if (to == beklenen2 && !zar2Used) {
+                zar2Used = true;
+            } else {
+                return false;
+            }
+        
+            // Rakip taşı varsa ve yalnızsa → kır
             if (board[to][0] == 1 && board[to][1] != playerId) {
                 int rakip = board[to][1];
                 bar[rakip]++;
                 board[to][0] = 0;
                 board[to][1] = 0;
             }
-
+        
+            // Taşı yerleştir
             bar[playerId]--;
             board[to][0]++;
             board[to][1] = playerId;
             return true;
         }
-
-        // Hedef geçerli mi?
+    
+        // 🟠 2. Normal taş oynama durumu
         if (from < 0 || to < 0 || from >= 24 || to >= 24) return false;
+    
+        // Oyuncuya ait taş mı?
         if (board[from][0] == 0 || board[from][1] != playerId) return false;
+    
+        // Rakip taşı varsa ve birden fazlaysa gidilemez
         if (board[to][0] > 1 && board[to][1] != playerId) return false;
-
-        // Zar kontrolü
-        int fark = Math.abs(to - from);
+    
+        // Yönlü fark hesaplama
+        int fark = (playerId == 1) ? to - from : from - to;
+        if (fark <= 0) return false;
+    
         if (fark == zar1 && !zar1Used) {
             zar1Used = true;
         } else if (fark == zar2 && !zar2Used) {
@@ -117,24 +121,25 @@ public class Game {
         } else {
             return false;
         }
-
-        // Rakip taşı varsa ve yalnızsa → kır
+    
+        // Rakip yalnız taş varsa → kır
         if (board[to][0] == 1 && board[to][1] != playerId) {
             int rakip = board[to][1];
             bar[rakip]++;
             board[to][0] = 0;
             board[to][1] = 0;
         }
-
-        // Hamleyi uygula
+    
+        // Taşı hareket ettir
         board[from][0]--;
         if (board[from][0] == 0) board[from][1] = 0;
-
+    
         if (board[to][0] == 0) board[to][1] = playerId;
         board[to][0]++;
-
+    
         return true;
     }
+    
 
 
 
