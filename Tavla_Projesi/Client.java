@@ -96,6 +96,11 @@ public class Client extends JFrame {
                     String messageFromServer;
                     while ((messageFromServer = input.readLine()) != null) {
                         
+                        if (messageFromServer.startsWith("Sunucuya bağlandınız. Oyuncu ID'niz:")) {
+                            playerId = Integer.parseInt(messageFromServer.replaceAll("[^0-9]", ""));
+                            continue;
+                        }
+
                         if (messageFromServer.equals("SIRA")) {
                             myTurn = true;
                             rollDiceButton.setEnabled(true);
@@ -175,7 +180,8 @@ public class Client extends JFrame {
 
     }
 
-    private void updateBoard(int[][] board) {
+/*      TEST AMAÇLI TAHTA GÜNCELLEME
+        private void updateBoard(int[][] board) {
         for (int i = 0; i < 24; i++) {
             int count = board[i][0];
             int owner = board[i][1];
@@ -190,26 +196,33 @@ public class Client extends JFrame {
                 boardButtons[i].setText(stones);
             }
         }
-    }   
+    }   */
 
-    private void updateBoardFromString(String data) {
-        String[] points = data.split(";");
-        for (int i = 0; i < 24; i++) {
-            String[] parts = points[i].split(",");
-            int count = Integer.parseInt(parts[0]);
-            int owner = Integer.parseInt(parts[1]);
-
-            if (count == 0) {
-                boardButtons[i].setText("Nokta " + i);
-            } else {
-                String stones = "";
-                for (int j = 0; j < count; j++) {
-                    stones += (owner == playerId) ? "●" : "○";
+        private void updateBoardFromString(String data) {
+            if (playerId == -1) return; // Oyuncu ID henüz belirlenmediyse çık
+        
+            String[] points = data.split(";");
+            for (int i = 0; i < 24; i++) {
+                String[] parts = points[i].split(",");
+                int count = Integer.parseInt(parts[0]);
+                int owner = Integer.parseInt(parts[1]);
+            
+                if (count == 0) {
+                    boardButtons[i].setText("Nokta " + i);
+                } else {
+                    String stones = "";
+                    String ownSymbol = (playerId == 1) ? "●" : "○";
+                    String opponentSymbol = (playerId == 1) ? "○" : "●";
+                
+                    for (int j = 0; j < count; j++) {
+                        stones += (owner == playerId) ? ownSymbol : opponentSymbol;
+                    }
+                
+                    boardButtons[i].setText(stones); // <-- artık doğru yerde
                 }
-                boardButtons[i].setText(stones);
             }
         }
-    }
+
 
 
 

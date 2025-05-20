@@ -13,12 +13,21 @@ public class Game {
     
     private Random random;
 
+    // Zar kullanma durumunu kontrol ediyorum
+    private boolean zar1Used = false;
+    private boolean zar2Used = false;
+
+
     public Game() {
 
         board = new int[24][2]; // [taş sayısı, oyuncu numara]
         random = new Random();
         currentPlayer = 1; // Oyuna 1. oyuncu başlasın
         initializeBoard();
+    }
+
+    public boolean bothDiceUsed() {
+        return zar1Used && zar2Used;
     }
 
     // Başlangıç pozisyounu
@@ -39,10 +48,13 @@ public class Game {
     
     // Zar atma Fonksiyonu (Tur başı 2 zar)
     public void rollDice() {
-        dice1 = random.nextInt(6) + 1; // 1-6 arası zar
-        dice2 = random.nextInt(6) + 1; 
+        dice1 = random.nextInt(6) + 1;
+        dice2 = random.nextInt(6) + 1;
+        zar1Used = false;
+        zar2Used = false;
         System.out.println("Oyuncu " + currentPlayer + " zar attı: " + dice1 + " ve " + dice2);
     }
+
 
     public String serializeBoard() {
         StringBuilder sb = new StringBuilder();
@@ -55,40 +67,38 @@ public class Game {
 
     // Hamle gerçekleştirme Fonksiyonu 
     public boolean movePiece(int from, int to, int playerId, int zar1, int zar2) {
-        // 1. Taş gerçekten orada mı?
-        if (board[from][0] == 0 || board[from][1] != playerId) {
-            return false;
-        }
-
-        // 2. Hedef nokta geçerli mi?
-        if (to < 0 || to >= 24) {
-            return false;
-        }
-
-        // 3. Rakip taşı varsa (ileride kırma gelecek), şimdilik engelle
-        if (board[to][0] > 0 && board[to][1] != playerId) {
-            return false;
-        }
-
-        // 4. Zar mesafesi uygun mu?
+        // Oyuncuya ait mi?
+        if (board[from][0] == 0 || board[from][1] != playerId) return false;
+        
+        // Tahta dışı mı?
+        if (to < 0 || to >= 24) return false;
+        
+        // Rakibin taşına gidilemez (şimdilik)
+        if (board[to][0] > 0 && board[to][1] != playerId) return false;
+        
+        // Zar değerine göre mi oynuyor?
         int fark = Math.abs(to - from);
-        if (fark != zar1 && fark != zar2) {
-            return false;
+        
+        if (fark == zar1 && !zar1Used) {
+            zar1Used = true;
+        } else if (fark == zar2 && !zar2Used) {
+            zar2Used = true;
+        } else {
+            return false; // Zarlarla uyumsuz
         }
-
-        // 5. Hamleyi uygula
+    
+        // Hamleyi uygula
         board[from][0]--;
-        if (board[from][0] == 0) {
-            board[from][1] = 0; // orası artık boş
-        }
-
-        if (board[to][0] == 0) {
-            board[to][1] = playerId; // boş yere ilk taşı koy
-        }
+        if (board[from][0] == 0) board[from][1] = 0;
+    
+        if (board[to][0] == 0) board[to][1] = playerId;
         board[to][0]++;
-
+    
         return true;
     }
+
+
+
 
     // Oyuncu Sırası Değiştirme
     public void switchPlayer() {

@@ -176,23 +176,25 @@ class ClientHandler implements Runnable {
                         continue;
                     }
                 
-                    // Tahta güncelle ve sırayı değiştir
+                    // Tahta güncelle
                     for (ClientHandler c : Server.getClients()) {
                         c.sendMessage("TAHTA:" + Server.game.serializeBoard());
                     }
                 
-                    Server.game.switchPlayer();
-                
-                    for (ClientHandler c : Server.getClients()) {
-                        if (c.getPlayerId() == Server.game.getCurrentPlayer()) {
-                            c.sendMessage("SIRA");
+                    // Eğer iki zar da kullanıldıysa sıra geçsin
+                    if (Server.game.bothDiceUsed()) {
+                        Server.game.switchPlayer();
+                        for (ClientHandler c : Server.getClients()) {
+                            if (c.getPlayerId() == Server.game.getCurrentPlayer()) {
+                                c.sendMessage("SIRA");
+                            }
                         }
                     }
                 
-                    continue;
+                    continue; // move işlemi tamamlandı, buradan çık
                 }
             
-                // Diğer her mesaj (sohbet gibi) herkese yayınla
+                // Diğer mesajlar (sohbet) → tüm clientlara gönder
                 synchronized (Server.class) {
                     for (ClientHandler client : Server.getClients()) {
                         client.sendMessage("Oyuncu " + playerId + ": " + message);
@@ -210,5 +212,6 @@ class ClientHandler implements Runnable {
                 System.err.println("Bağlantı kapatma hatası.");
             }
         }
-    }  
+    }
+ 
 }
