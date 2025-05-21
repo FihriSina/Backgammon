@@ -70,7 +70,7 @@ public class Game {
 
     // Hamle gerçekleştirme Fonksiyonu 
     public boolean movePiece(int from, int to, int playerId, int zar1, int zar2) {
-        // 🟠 1. Bar'dan çıkış durumu
+        //  1. Bar'dan çıkış durumu
         if (bar[playerId] > 0) {
             boolean barExit = (playerId == 1) ? to <= 5 : to >= 18;
             if (!barExit || from != -1) return false;
@@ -101,7 +101,7 @@ public class Game {
             return true;
         }
     
-        // 🟠 2. Normal taş oynama durumu
+        //  2. Normal taş oynama durumu
         if (from < 0 || to < 0 || from >= 24 || to >= 24) return false;
     
         // Oyuncuya ait taş mı?
