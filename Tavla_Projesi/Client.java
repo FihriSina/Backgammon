@@ -239,7 +239,7 @@ public class Client extends JFrame {
                 }
             }
         
-            // ⬇️ Bar verisi varsa göster
+            //  Bar verisi varsa göster
             if (!barInfo.isEmpty()) {
 
                 String ownSymbol = (playerId == 1) ? "●" : "○";
