@@ -261,54 +261,54 @@ public class Client extends JFrame {
         }
 
         private void handlePointClick(int pointIndex) {
-            // 1. Sıra kontrolü
             if (!myTurn) {
                 chatArea.append("Sıra sizde değil.\n");
                 return;
             }
         
-            // 2. Bar'dan çıkma durumu
+            // Eğer bar'da taş varsa sadece bar'dan çıkmaya izin ver
             if (bar[playerId] > 0) {
-                // Bar’dan çıkış için taş seçilmeden doğrudan hedef seçilecek
-                int hedefNokta = pointIndex;
+                int hedef1 = (playerId == 1) ? zar1 - 1 : 24 - zar1;
+                int hedef2 = (playerId == 1) ? zar2 - 1 : 24 - zar2;
             
-                // Hedef nokta zarla uyumlu mu?
-                int beklenen = (playerId == 1) ? zar1 - 1 : 24 - zar1;
-                int beklenen2 = (playerId == 1) ? zar2 - 1 : 24 - zar2;
-            
-                if (hedefNokta != beklenen && hedefNokta != beklenen2) {
-                    chatArea.append("Zar değeriyle bar'dan bu noktaya çıkılamaz.\n");
+                if (pointIndex != hedef1 && pointIndex != hedef2) {
+                    chatArea.append("Bar'daki taşı sadece " + hedef1 + " veya " + hedef2 + ". noktaya koyabilirsiniz.\n");
                     return;
                 }
             
-                // Bar’dan hamle gönder: from == -1
-                output.println("move:-1->" + hedefNokta);
-                chatArea.append("Bar'dan çıkış hamlesi gönderildi: -> Nokta " + hedefNokta + "\n");
+                // Bar’dan çıkış hamlesi gönder
+                output.println("move:-1->" + pointIndex);
+                chatArea.append("Bar'dan çıkış hamlesi gönderildi: -> Nokta " + pointIndex + "\n");
                 return;
             }
-
         
-            // 3. Normal taş seçimi ve hamlesi
+            // Normal taş seçimi
+            String ownSymbol = (playerId == 1) ? "●" : "○";
+            String btnText = boardButtons[pointIndex].getText();
+        
             if (selectedPoint == -1) {
+                if (!btnText.startsWith(ownSymbol)) {
+                    chatArea.append("Bu noktada kendi taşınız yok!\n");
+                    return;
+                }
+            
                 selectedPoint = pointIndex;
                 chatArea.append("Taş seçildi: Nokta " + pointIndex + "\n");
             } else {
-                int expectedTo1 = selectedPoint + zar1;
-                int expectedTo2 = selectedPoint + zar2;
+                int hedef1 = (playerId == 1) ? selectedPoint + zar1 : selectedPoint - zar1;
+                int hedef2 = (playerId == 1) ? selectedPoint + zar2 : selectedPoint - zar2;
             
-                if (pointIndex != expectedTo1 && pointIndex != expectedTo2) {
-                    chatArea.append("Zar değerlerine uygun hamle yapmalısınız.\n");
+                if (pointIndex != hedef1 && pointIndex != hedef2) {
+                    chatArea.append("Zar değerine uygun hamle yapmalısınız.\n");
                     selectedPoint = -1;
                     return;
                 }
             
-                chatArea.append("Hamle: " + selectedPoint + " -> " + pointIndex + "\n");
                 output.println("move:" + selectedPoint + "->" + pointIndex);
+                chatArea.append("Hamle gönderildi: " + selectedPoint + " -> " + pointIndex + "\n");
                 selectedPoint = -1;
             }
         }
-
-
 
 
     // Mesaj gönderme fonksiyonu
