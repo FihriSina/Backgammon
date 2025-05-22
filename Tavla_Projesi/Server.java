@@ -122,7 +122,7 @@ class ClientHandler implements Runnable {
 
 
     @Override
-    public void run() {
+    public void run() { 
         try {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(socket.getOutputStream(), true);
