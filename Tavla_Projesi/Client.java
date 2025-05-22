@@ -65,6 +65,10 @@ public class Client extends JFrame {
         diceLabel1 = new JLabel("Zar 1: -");
         diceLabel2 = new JLabel("Zar 2: -");
         rollDiceButton = new JButton("Zar At");
+
+        JButton resetButton = new JButton("Reset");
+        dicePanel.add(resetButton);
+
         rollDiceButton.setEnabled(false); // Sırası gelmeyene pasif
 
         dicePanel.add(diceLabel1);
@@ -76,6 +80,10 @@ public class Client extends JFrame {
         barLabel = new JLabel("Bar: -"); // ilk değer
         add(barLabel, BorderLayout.WEST);
 
+        // Reset butonu işlevi
+        resetButton.addActionListener(e -> {
+            output.println("reset_game");
+        });
 
         // Zar At butonu işlevi
         rollDiceButton.addActionListener(e -> {
@@ -144,13 +152,24 @@ public class Client extends JFrame {
                             continue;
                         }
 
+                        if (messageFromServer.equals("RESET")) {
+                            diceLabel1.setText("Zar 1: -");
+                            diceLabel2.setText("Zar 2: -");
+                            zar1 = -1;
+                            zar2 = -1;
+                            selectedPoint = -1;
+                            chatArea.append("🔁 Oyun sıfırlandı. Zarlar temizlendi.\n");
+                            continue;
+                        }                   
+
+                        //  Diğer mesajlar (örnek: rakip zar)
                         if (messageFromServer.startsWith("RAKIP_ZAR:")) {
                             String[] parts = messageFromServer.substring(10).split(",");
                             int d1 = Integer.parseInt(parts[0]);
                             int d2 = Integer.parseInt(parts[1]);
                             diceLabel1.setText("Rakip Zar 1: " + d1);
                             diceLabel2.setText("Rakip Zar 2: " + d2);
-                            myTurn = false; // sırası bizde değil
+                            myTurn = false;
                             rollDiceButton.setEnabled(false);
                             chatArea.append("Rakip zar attı: " + d1 + " ve " + d2 + "\n");
                             continue;
@@ -182,9 +201,9 @@ public class Client extends JFrame {
 
         add(boardPanel, BorderLayout.EAST); // Sağa yerleştirdik
 
-        // TEST AMAÇLI TAŞ EKLEME
+    /*     // TEST AMAÇLI TAŞ EKLEME
         boardButtons[0].setText("●●●");        // Oyuncu 1 taşları
-        boardButtons[23].setText("●●●●●");     // Oyuncu 2 taşları
+        boardButtons[23].setText("●●●●●");     // Oyuncu 2 taşları */
 
     }
 
@@ -243,6 +262,9 @@ public class Client extends JFrame {
             if (!barInfo.isEmpty()) {
 
                 String ownSymbol = (playerId == 1) ? "●" : "○";
+                String[] barParts = barInfo.split(",");
+                bar[1] = Integer.parseInt(barParts[0]);
+                bar[2] = Integer.parseInt(barParts[1]);
                 int ownBarCount = bar[playerId];
                 StringBuilder barStones = new StringBuilder("Bar: ");
                 for (int i = 0; i < ownBarCount; i++) {
@@ -250,9 +272,8 @@ public class Client extends JFrame {
                 }
                 barLabel.setText(barStones.toString());
                 
-                String[] barParts = barInfo.split(",");
-                bar[1] = Integer.parseInt(barParts[0]);
-                bar[2] = Integer.parseInt(barParts[1]);
+
+
             
                 if (bar[playerId] > 0) {
                     chatArea.append("Bar'da taşınız var. Önce onu tahtaya çıkarmalısınız.\n");
@@ -294,21 +315,31 @@ public class Client extends JFrame {
             
                 selectedPoint = pointIndex;
                 chatArea.append("Taş seçildi: Nokta " + pointIndex + "\n");
-            } else {
-                int hedef1 = (playerId == 1) ? selectedPoint + zar1 : selectedPoint - zar1;
-                int hedef2 = (playerId == 1) ? selectedPoint + zar2 : selectedPoint - zar2;
-            
-                if (pointIndex != hedef1 && pointIndex != hedef2) {
-                    chatArea.append("Zar değerine uygun hamle yapmalısınız.\n");
+                } else {
+                    int hedef1 = (playerId == 1) ? selectedPoint + zar1 : selectedPoint - zar1;
+                    int hedef2 = (playerId == 1) ? selectedPoint + zar2 : selectedPoint - zar2;
+                
+                    // 🔁 DIŞARI ÇIKMA KONTROLÜ
+                    if ((playerId == 1 && (selectedPoint + zar1 == 24 || selectedPoint + zar2 == 24)) ||
+                        (playerId == 2 && (selectedPoint - zar1 == -1 || selectedPoint - zar2 == -1))) {
+                        
+                        output.println("move:" + selectedPoint + "->OUT");
+                        chatArea.append("Taşı dışarı çıkardınız!\n");
+                        selectedPoint = -1;
+                        return;
+                    }
+                
+                    if (pointIndex != hedef1 && pointIndex != hedef2) {
+                        chatArea.append("Zar değerine uygun hamle yapmalısınız.\n");
+                        selectedPoint = -1;
+                        return;
+                    }
+                
+                    output.println("move:" + selectedPoint + "->" + pointIndex);
+                    chatArea.append("Hamle gönderildi: " + selectedPoint + " -> " + pointIndex + "\n");
                     selectedPoint = -1;
-                    return;
                 }
-            
-                output.println("move:" + selectedPoint + "->" + pointIndex);
-                chatArea.append("Hamle gönderildi: " + selectedPoint + " -> " + pointIndex + "\n");
-                selectedPoint = -1;
             }
-        }
 
 
     // Mesaj gönderme fonksiyonu

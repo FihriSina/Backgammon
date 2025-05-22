@@ -19,6 +19,8 @@ public class Game {
     
     private int[] bar = new int[3]; // bar[1] → oyuncu 1, bar[2] → oyuncu 2
 
+    int[] out = new int[3]; // out[1] = oyuncu1'in dışarı çıkardığı taşlar, out[2] = oyuncu2
+
     public Game() {
 
         board = new int[24][2]; // [taş sayısı, oyuncu numara]
@@ -54,8 +56,13 @@ public class Game {
         zar1Used = false;
         zar2Used = false;
         System.out.println("Oyuncu " + currentPlayer + " zar attı: " + dice1 + " ve " + dice2);
-    }
 
+        // Çift zar atıldıysa, iki zar yerine dört kez oynama hakkı olacak şekilde simülasyon yapılabilir
+        if (dice1 == dice2) {
+            // Öneri: zar1Used ve zar2Used sayacına benzer 4 hak için sayaç yapılabilir (zorunlu değil)
+            System.out.println("Çift zar atıldı! 4 hamle hakkı.");
+        }
+    }
 
     public String serializeBoard() {
         StringBuilder sb = new StringBuilder();
@@ -63,14 +70,38 @@ public class Game {
             sb.append(board[i][0]).append(",").append(board[i][1]);
             if (i < 23) sb.append(";");
         }
+        // BAR kısmını da her zaman güncel olarak ekle
         sb.append("|BAR:").append(bar[1]).append(",").append(bar[2]);
 
         return sb.toString();
     }
-
+    
     // Hamle gerçekleştirme Fonksiyonu 
     public boolean movePiece(int from, int to, int playerId, int zar1, int zar2) {
-        //  1. Bar'dan çıkış durumu
+        // 0. Taş dışarı çıkarma durumu
+        if ((playerId == 1 && to == 24) || (playerId == 2 && to == -1)) {
+            if (from < 0 || from >= 24) return false;
+            if (board[from][0] == 0 || board[from][1] != playerId) return false;
+        
+            int fark = (playerId == 1) ? to - from : from - to;
+        
+            if (fark == zar1 && !zar1Used) {
+                zar1Used = true;
+            } else if (fark == zar2 && !zar2Used) {
+                zar2Used = true;
+            } else {
+                return false;
+            }
+        
+            // Taşı dışarı çıkar
+            board[from][0]--;
+            if (board[from][0] == 0) board[from][1] = 0;
+        
+            out[playerId]++;
+            return true;
+        }
+    
+        // 1. Bar'dan çıkış
         if (bar[playerId] > 0) {
             boolean barExit = (playerId == 1) ? to <= 5 : to >= 18;
             if (!barExit || from != -1) return false;
@@ -86,7 +117,10 @@ public class Game {
                 return false;
             }
         
-            // Rakip taşı varsa ve yalnızsa → kır
+            // 🚨 Rakip taşı varsa ve 2 veya daha fazlaysa → GİRİLEMEZ
+            if (board[to][0] > 1 && board[to][1] != playerId) return false;
+        
+            // Eğer sadece 1 rakip taşı varsa → kır
             if (board[to][0] == 1 && board[to][1] != playerId) {
                 int rakip = board[to][1];
                 bar[rakip]++;
@@ -94,23 +128,18 @@ public class Game {
                 board[to][1] = 0;
             }
         
-            // Taşı yerleştir
             bar[playerId]--;
             board[to][0]++;
             board[to][1] = playerId;
             return true;
         }
+
     
-        //  2. Normal taş oynama durumu
+        // 2. Normal taş oynama
         if (from < 0 || to < 0 || from >= 24 || to >= 24) return false;
-    
-        // Oyuncuya ait taş mı?
         if (board[from][0] == 0 || board[from][1] != playerId) return false;
-    
-        // Rakip taşı varsa ve birden fazlaysa gidilemez
         if (board[to][0] > 1 && board[to][1] != playerId) return false;
     
-        // Yönlü fark hesaplama
         int fark = (playerId == 1) ? to - from : from - to;
         if (fark <= 0) return false;
     
@@ -122,7 +151,6 @@ public class Game {
             return false;
         }
     
-        // Rakip yalnız taş varsa → kır
         if (board[to][0] == 1 && board[to][1] != playerId) {
             int rakip = board[to][1];
             bar[rakip]++;
@@ -130,7 +158,6 @@ public class Game {
             board[to][1] = 0;
         }
     
-        // Taşı hareket ettir
         board[from][0]--;
         if (board[from][0] == 0) board[from][1] = 0;
     
@@ -139,6 +166,7 @@ public class Game {
     
         return true;
     }
+    
     
 
 

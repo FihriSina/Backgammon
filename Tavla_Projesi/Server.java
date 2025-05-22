@@ -97,7 +97,7 @@ public class Server {
     
 }
 
-// Her Client bağlantısını yönetecek ClientHandler Sınıfı
+// Her Client bağlantısını yönetecek ClientHandler Sınıfı: 
 class ClientHandler implements Runnable {
     private Socket socket;
     private BufferedReader input;
@@ -133,6 +133,28 @@ class ClientHandler implements Runnable {
             while ((message = input.readLine()) != null) {
                 System.out.println("Oyuncu " + playerId + ": " + message);
 
+                // RESET KOMUTU
+                if (message.equals("reset_game")) {
+                    System.out.println("Oyuncu " + playerId + " oyunu resetledi.");
+                    Server.game = new Game(); // Yeni bir Game nesnesi oluştur
+                    for (ClientHandler c : Server.getClients()) {
+                        c.sendMessage("TAHTA:" + Server.game.serializeBoard()); // herkese yeni tahtayı gönder
+                    }
+                    for (ClientHandler c : Server.getClients()) {
+                        c.sendMessage("RESET");
+                    }
+                    
+                    // Oyunu baştan başlat
+                    for (ClientHandler c : Server.getClients()) {
+                        if (c.getPlayerId() == 1) {
+                            c.sendMessage("SIRA");
+                        } else {
+                            c.sendMessage("Rakip zar atacak...");
+                        }
+                    }
+                    continue;
+                }
+                
                 // Zar atma isteği
                 if (message.equals("roll_dice")) {
                     if (playerId != Server.game.getCurrentPlayer()) {
@@ -164,8 +186,17 @@ class ClientHandler implements Runnable {
                     }
 
                     String[] parts = message.substring(5).split("->");
+                    
                     int from = Integer.parseInt(parts[0]);
-                    int to = Integer.parseInt(parts[1]);
+                    int to;
+
+                    if (parts[1].equals("OUT")) {
+                        to = (playerId == 1) ? 24 : -1; // 1. oyuncu 24’e, 2. oyuncu -1’e taş çıkartır
+                    } else {
+                        to = Integer.parseInt(parts[1]);
+                    }
+
+
 
                     int d1 = Server.game.getDice1();
                     int d2 = Server.game.getDice2();
@@ -177,19 +208,21 @@ class ClientHandler implements Runnable {
                     }
 
                     // Tahta güncelle
+                    String boardData = Server.game.serializeBoard(); // sadece 1 kez çağrılıyor
                     for (ClientHandler c : Server.getClients()) {
-                        c.sendMessage("TAHTA:" + Server.game.serializeBoard());
+                        c.sendMessage("TAHTA:" + boardData); // her client'a aynı veri gönderiliyor
                     }
+
                     
                     // Oyun bitti mi?
-                    if (Server.game.isGameOver()) {
-                        int winner = Server.game.getWinner();
+                    if (Server.game.out[1] == 15 || Server.game.out[2] == 15) {
+                        int winner = (Server.game.out[1] == 15) ? 1 : 2;
                         for (ClientHandler c : Server.getClients()) {
                             c.sendMessage("OYUN_BITTI: Oyuncu " + winner + " kazandı!");
                         }
                         return;
                     }
-                    
+
                     // Eğer iki zar da kullanıldıysa sıra geçsin
                     if (Server.game.bothDiceUsed()) {
                         Server.game.switchPlayer();
