@@ -34,15 +34,19 @@ public class Client extends JFrame {
     private ImageIcon blackStoneIcon;
     private ImageIcon whiteStoneIcon;
 
-    public Client(String serverIP, int serverPort) {
-
+    private ImageIcon loadIcon(String path) {
         try {
-            blackStoneIcon = new ImageIcon(getClass().getResource("/res/black_stone.png"));
-            whiteStoneIcon = new ImageIcon(getClass().getResource("/res/white_stone.png"));
+            Image img = new ImageIcon(getClass().getResource(path)).getImage();
+            Image scaled = img.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaled);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Taş ikonları yüklenemedi: " + e.getMessage(), "Hata", JOptionPane.ERROR_MESSAGE);
+            System.err.println("İkon yüklenemedi: " + path);
+            return null;
         }
+    }
 
+    public Client(String serverIP, int serverPort) {
+        
         setTitle("Tavla Client");
         setSize(1000, 700);
         setLocationRelativeTo(null);
@@ -54,6 +58,9 @@ public class Client extends JFrame {
         chatArea.setLineWrap(true);
         chatArea.setWrapStyleWord(true);
         add(new JScrollPane(chatArea), BorderLayout.CENTER);
+
+        blackStoneIcon = loadIcon("/res/black_stone.png");
+        whiteStoneIcon = loadIcon("/res/white_stone.png");
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         userInputField = new JTextField();
@@ -92,6 +99,7 @@ public class Client extends JFrame {
 
         for (int i = 0; i < 24; i++) {
             JPanel pointPanel = new JPanel();
+            pointPanel.setBorder(BorderFactory.createLineBorder(Color.RED)); // test için
             pointPanel.setLayout(new BoxLayout(pointPanel, BoxLayout.Y_AXIS));
             pointPanel.setOpaque(false);
             pointPanel.setPreferredSize(new Dimension(50, 120));
@@ -200,16 +208,26 @@ public class Client extends JFrame {
             int count = Integer.parseInt(p[0]);
             int owner = Integer.parseInt(p[1]);
             boardPanels[i].removeAll();
+
             for (int j = 0; j < count; j++) {
                 JLabel lbl = new JLabel();
                 lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
                 lbl.setPreferredSize(new Dimension(30, 30));
-                lbl.setIcon((owner == playerId) ? blackStoneIcon : whiteStoneIcon);
+            
+                // Doğru ikonla ölçeklenmiş ImageIcon ata
+                ImageIcon baseIcon = (owner == playerId) ? blackStoneIcon : whiteStoneIcon;
+                if (baseIcon != null) {
+                    Image scaledImg = baseIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+                    lbl.setIcon(new ImageIcon(scaledImg));
+                }
+            
                 boardPanels[i].add(lbl);
             }
+        
             boardPanels[i].revalidate();
             boardPanels[i].repaint();
         }
+
 
         if (!barInfo.isEmpty()) {
             String ownSymbol = (playerId == 1) ? "⚫" : "⚪";
