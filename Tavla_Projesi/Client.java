@@ -156,6 +156,7 @@ public class Client extends JFrame {
                     while ((msg = input.readLine()) != null) {
                         if (msg.startsWith("Sunucuya bağlandınız.")) {
                             playerId = Integer.parseInt(msg.replaceAll("[^0-9]", ""));
+                            chatArea.append("Oyuncu ID: " + playerId + "\n");
                             continue;
                         }
                         if (msg.equals("SIRA")) {
@@ -168,7 +169,7 @@ public class Client extends JFrame {
                             chatArea.append("🎉 " + msg + "\n");
                             rollDiceButton.setEnabled(false);
                             myTurn = false;
-                            return;
+                            continue; 
                         }
                         if (msg.startsWith("TAHTA:")) {
                             updateBoardFromString(msg.substring(6));
