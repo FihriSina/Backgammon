@@ -55,6 +55,7 @@ public class Client extends JFrame {
         pointPanel.setLayout(new BoxLayout(pointPanel, BoxLayout.Y_AXIS));
         pointPanel.setOpaque(false);
         pointPanel.setPreferredSize(new Dimension(50, 120));
+        
         pointPanel.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 handlePointClick(index);
@@ -115,7 +116,7 @@ public class Client extends JFrame {
         add(barLabel, BorderLayout.WEST);
 
         Image bg = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/res/tavlatahtasi.png"));
-        boardPanel = new JPanel(new GridLayout(2, 12)) {
+        boardPanel = new JPanel(null) {  // null layout yaptık
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -123,16 +124,93 @@ public class Client extends JFrame {
             }
         };
 
-        for (int i = 23; i >= 12; i--) {
-            JPanel pointPanel = createPointPanel(i);
-            boardPanels[i] = pointPanel;
-            boardPanel.add(pointPanel);
+        // Tahta boyutuna uygun panel genişlik ve yükseklik
+        int panelWidth = 50;
+        int panelHeight = 120;
+
+        // Şimdi panelleri ekle ve konumlandır
+        // X ve Y koordinatlarını istediğin gibi ayarlayabilmen için diziler oluşturduk
+
+        int[] xPositions = new int[24];  // her hazne için x pozisyonu burada olacak
+        int[] yPositions = new int[24];  // her hazne için y pozisyonu burada olacak
+
+        // Şu örnek değerleri başlangıç için koydum, istediğin gibi değiştir
+        // Üst satır: (23-12) sağdan sola, y = 10
+        for (int i = 23, pos = 0; i >= 12; i--, pos++) {
+            xPositions[i] = 10 + pos * (panelWidth + 5);
+            yPositions[i] = 10;
         }
+
+        // Alt satır: (0-11) soldan sağa, y = panelHeight + 25
         for (int i = 0; i <= 11; i++) {
-            JPanel pointPanel = createPointPanel(i);
-            boardPanels[i] = pointPanel;
-            boardPanel.add(pointPanel);
+            xPositions[i] = 10 + i * (panelWidth + 5);
+            yPositions[i] = panelHeight + 25;
         }
+        xPositions[0] = 25;  // Hazne 0 biraz daha sağa kayar
+        yPositions[0] = 450; // Hazne 0 biraz daha aşağı kayar
+        xPositions[1] = 75;  // Hazne 0 biraz daha sağa kayar
+        yPositions[1] = 450; // Hazne 0 biraz daha aşağı kayar
+        xPositions[2] = 125;  // Hazne 0 biraz daha sağa kayar
+        yPositions[2] = 450; // Hazne 0 biraz daha aşağı kayar
+        xPositions[3] = 175;  // Hazne 0 biraz daha sağa kayar
+        yPositions[3] = 450; // Hazne 0 biraz daha aşağı kayar
+        xPositions[4] = 225;  // Hazne 0 biraz daha sağa kayar
+        yPositions[4] = 450; // Hazne 0 biraz daha aşağı kayar
+        xPositions[5] = 275;  // Hazne 0 biraz daha sağa kayar
+        yPositions[5] = 450; // Hazne 0 biraz daha aşağı kayar
+
+        xPositions[6] = 350;  // Hazne 0 biraz daha sağa kayar
+        yPositions[6] = 450; // Hazne 0 biraz daha aşağı kayar
+        xPositions[7] = 400;  // Hazne 0 biraz daha sağa kayar
+        yPositions[7] = 450; // Hazne 0 biraz daha aşağı kayar
+        xPositions[8] = 450;  // Hazne 0 biraz daha sağa kayar
+        yPositions[8] = 450; // Hazne 0 biraz daha aşağı kayar
+        xPositions[9] = 500;  // Hazne 0 biraz daha sağa kayar
+        yPositions[9] = 450; // Hazne 0 biraz daha aşağı kayar
+        xPositions[10] = 550;  // Hazne 0 biraz daha sağa kayar
+        yPositions[10] = 450; // Hazne 0 biraz daha aşağı kayar
+        xPositions[11] = 600;  // Hazne 0 biraz daha sağa kayar
+        yPositions[11] = 450; // Hazne 0 biraz daha aşağı kayar
+
+        xPositions[12] = 600;  // Hazne 0 biraz daha sağa kayar
+        yPositions[12] = 30; // Hazne 0 biraz daha aşağı kayar
+        xPositions[13] = 550;  // Hazne 0 biraz daha sağa kayar
+        yPositions[13] = 30; // Hazne 0 biraz daha aşağı kayar
+        xPositions[14] = 500;  // Hazne 0 biraz daha sağa kayar
+        yPositions[14] = 30; // Hazne 0 biraz daha aşağı kayar
+        xPositions[15] = 450;  // Hazne 0 biraz daha sağa kayar
+        yPositions[15] = 30; // Hazne 0 biraz daha aşağı kayar
+        xPositions[16] = 400;  // Hazne 0 biraz daha sağa kayar
+        yPositions[16] = 30; // Hazne 0 biraz daha aşağı kayar
+        xPositions[17] = 350;  // Hazne 0 biraz daha sağa kayar
+        yPositions[17] = 30; // Hazne 0 biraz daha aşağı kayar
+
+        xPositions[18] = 25;  // Hazne 0 biraz daha sağa kayar
+        yPositions[18] = 30; // Hazne 0 biraz daha aşağı kayar
+        xPositions[19] = 75;  // Hazne 0 biraz daha sağa kayar
+        yPositions[19] = 30; // Hazne 0 biraz daha aşağı kayar
+        xPositions[20] = 125;  // Hazne 0 biraz daha sağa kayar
+        yPositions[20] = 30; // Hazne 0 biraz daha aşağı kayar
+        xPositions[21] = 175;  // Hazne 0 biraz daha sağa kayar
+        yPositions[21] = 30; // Hazne 0 biraz daha aşağı kayar
+        xPositions[22] = 225;  // Hazne 0 biraz daha sağa kayar
+        yPositions[22] = 30; // Hazne 0 biraz daha aşağı kayar
+        xPositions[23] = 275;  // Hazne 0 biraz daha sağa kayar
+        yPositions[23] = 30; // Hazne 0 biraz daha aşağı kayar
+
+        // Panelleri oluştur, konumlandır ve ekle
+        for (int i = 0; i < 24; i++) {
+            JPanel pointPanel = createPointPanel(i);
+            pointPanel.setBounds(xPositions[i], yPositions[i], panelWidth, panelHeight);
+            boardPanel.add(pointPanel);
+            boardPanels[i] = pointPanel;
+        }
+
+        // Eğer boardPanel'in boyutunu ayarlaman gerekirse
+        boardPanel.setPreferredSize(new Dimension(
+            (panelWidth + 5) * 12 + 20,  // genişlik (12 kolon)
+            panelHeight * 2 + 35          // yükseklik (2 satır + aralar)
+        ));
 
         add(boardPanel, BorderLayout.EAST);
 

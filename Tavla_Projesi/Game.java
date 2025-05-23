@@ -37,6 +37,7 @@ public class Game {
         board[11][0] = 5; board[11][1] = 2;
         board[16][0] = 3; board[16][1] = 2;
         board[18][0] = 5; board[18][1] = 2;
+
     }
 
     public void rollDice() {
