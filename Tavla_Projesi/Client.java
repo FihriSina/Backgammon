@@ -299,7 +299,8 @@ public class Client extends JFrame {
                 return;
             }
             selectedPoint = pointIndex;
-            chatArea.append("Taş seçildi: " + pointIndex + "\n");
+            boardPanels[selectedPoint].setBackground(Color.YELLOW); // Vurgulu seçim
+            chatArea.append("Taş seçildi: " + pointIndex + "\n");              
         } else {
             int h1 = (playerId == 1) ? selectedPoint + zar1 : selectedPoint - zar1;
             int h2 = (playerId == 1) ? selectedPoint + zar2 : selectedPoint - zar2;
@@ -320,6 +321,7 @@ public class Client extends JFrame {
 
             output.println("move:" + selectedPoint + "->" + pointIndex);
             chatArea.append("Hamle: " + selectedPoint + " -> " + pointIndex + "\n");
+            boardPanels[selectedPoint].setBackground(null); // Arka planı temizle
             selectedPoint = -1;
         }
     }
