@@ -28,16 +28,39 @@ public class Game {
     }
 
     private void initializeBoard() {
-        board[23][0] = 2; board[23][1] = 1;
-        board[12][0] = 5; board[12][1] = 1;
-        board[7][0] = 3;  board[7][1] = 1;
-        board[5][0] = 5;  board[5][1] = 1;
+        // 23 numaralı hazineye 2 tane siyah taş koy (oyuncu 1)
+        board[23][0] = 5;    // Taş sayısı
+        board[23][1] = 0;    // Oyuncu numarası (1: siyah)
 
-        board[0][0] = 2;  board[0][1] = 2;
-        board[11][0] = 5; board[11][1] = 2;
-        board[16][0] = 3; board[16][1] = 2;
-        board[18][0] = 5; board[18][1] = 2;
+        // 12 numaralı hazineye 5 tane siyah taş koy
+        board[12][0] = 5;
+        board[12][1] = 1;
+
+        // 7 numaralı hazineye 3 tane siyah taş koy
+        board[7][0] = 3;
+        board[7][1] = 1;
+
+        // 5 numaralı hazineye 5 tane siyah taş koy
+        board[5][0] = 5;
+        board[5][1] = 1;
+
+        // 0 numaralı hazineye 2 tane beyaz taş koy (oyuncu 2)
+        board[0][0] = 2;
+        board[0][1] = 2;
+
+        // 11 numaralı hazineye 5 tane beyaz taş koy
+        board[11][0] = 5;
+        board[11][1] = 2;
+
+        // 16 numaralı hazineye 3 tane beyaz taş koy
+        board[16][0] = 3;
+        board[16][1] = 2;
+
+        // 18 numaralı hazineye 5 tane beyaz taş koy*
+        board[18][0] = 2;
+        board[18][1] = 1;
     }
+
 
     public void rollDice() {
         dice1 = random.nextInt(6) + 1;
