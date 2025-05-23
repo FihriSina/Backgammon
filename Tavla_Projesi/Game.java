@@ -35,17 +35,18 @@ public class Game {
 
     // Başlangıç pozisyounu
     private void initializeBoard() {
-        // Oyuncu 1 taşları
-        board[0][0] = 2;  board[0][1] = 1;
-        board[11][0] = 5; board[11][1] = 1;
-        board[16][0] = 3; board[16][1] = 1;
-        board[18][0] = 5; board[18][1] = 1;
-
-        // Oyuncu 2 taşları
-        board[23][0] = 2; board[23][1] = 2;
-        board[12][0] = 5; board[12][1] = 2;
-        board[7][0] = 3;  board[7][1] = 2;
-        board[5][0] = 5;  board[5][1] = 2;
+        // Oyuncu 1 (siyah)
+        board[23][0] = 2; board[23][1] = 1; // sağ üst köşe
+        board[12][0] = 5; board[12][1] = 1; // üst sol
+        board[7][0] = 3;  board[7][1] = 1; // alt sağ
+        board[5][0] = 5;  board[5][1] = 1; // alt orta
+            
+        // Oyuncu 2 (beyaz)
+        board[0][0] = 2;  board[0][1] = 2; // sol alt köşe
+        board[11][0] = 5; board[11][1] = 2; // alt sol
+        board[16][0] = 3; board[16][1] = 2; // üst sağ
+        board[18][0] = 5; board[18][1] = 2; // üst orta
+            
     }
 
     
@@ -82,7 +83,7 @@ public class Game {
         if ((playerId == 1 && to == 24) || (playerId == 2 && to == -1)) {
             if (from < 0 || from >= 24) return false;
             if (board[from][0] == 0 || board[from][1] != playerId) return false;
-        
+
             // Tüm taşlar ev bölgesinde mi kontrol et
             int start = (playerId == 1) ? 18 : 0;
             int end = (playerId == 1) ? 24 : 6;
@@ -91,7 +92,7 @@ public class Game {
                     return false; // evde olmayan taş varsa çıkamaz
                 }
             }
-        
+
             int fark = (playerId == 1) ? to - from : from - to;
             if (fark == zar1 && !zar1Used) {
                 zar1Used = true;
@@ -100,21 +101,21 @@ public class Game {
             } else {
                 return false;
             }
-        
+
             board[from][0]--;
             if (board[from][0] == 0) board[from][1] = 0;
             out[playerId]++;
             return true;
         }
-    
+
         // 1. Bar’dan çıkış
         if (bar[playerId] > 0) {
             boolean barExit = (playerId == 1) ? to <= 5 : to >= 18;
             if (!barExit || from != -1) return false;
-        
+
             int beklenen1 = (playerId == 1) ? zar1 - 1 : 24 - zar1;
             int beklenen2 = (playerId == 1) ? zar2 - 1 : 24 - zar2;
-        
+
             if (to == beklenen1 && !zar1Used) {
                 zar1Used = true;
             } else if (to == beklenen2 && !zar2Used) {
@@ -122,9 +123,9 @@ public class Game {
             } else {
                 return false;
             }
-        
+
             if (board[to][0] > 1 && board[to][1] != playerId) return false;
-        
+
             // Rakip taşı kır
             if (board[to][0] == 1 && board[to][1] != playerId) {
                 int rakip = board[to][1];
@@ -132,21 +133,21 @@ public class Game {
                 board[to][0] = 0;
                 board[to][1] = 0;
             }
-        
+
             bar[playerId]--;
             board[to][0]++;
             board[to][1] = playerId;
             return true;
         }
-    
+
         // 2. Normal taş hareketi
         if (from < 0 || to < 0 || from >= 24 || to >= 24) return false;
         if (board[from][0] == 0 || board[from][1] != playerId) return false;
         if (board[to][0] > 1 && board[to][1] != playerId) return false;
-    
+
         int fark = (playerId == 1) ? to - from : from - to;
         if (fark <= 0) return false;
-    
+
         if (fark == zar1 && !zar1Used) {
             zar1Used = true;
         } else if (fark == zar2 && !zar2Used) {
@@ -154,23 +155,23 @@ public class Game {
         } else {
             return false;
         }
-    
+
         if (board[to][0] == 1 && board[to][1] != playerId) {
             int rakip = board[to][1];
             bar[rakip]++;
             board[to][0] = 0;
             board[to][1] = 0;
         }
-    
+
         board[from][0]--;
         if (board[from][0] == 0) board[from][1] = 0;
-    
+
         if (board[to][0] == 0) board[to][1] = playerId;
         board[to][0]++;
-    
+
         return true;
     }
-    
+
     
     
 
