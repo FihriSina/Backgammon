@@ -78,13 +78,21 @@ public class Game {
     
     // Hamle gerçekleştirme Fonksiyonu 
     public boolean movePiece(int from, int to, int playerId, int zar1, int zar2) {
-        // 0. Taş dışarı çıkarma durumu
+        // 0. Taş dışarı çıkarma (bearing off)
         if ((playerId == 1 && to == 24) || (playerId == 2 && to == -1)) {
             if (from < 0 || from >= 24) return false;
             if (board[from][0] == 0 || board[from][1] != playerId) return false;
         
-            int fark = (playerId == 1) ? to - from : from - to;
+            // Tüm taşlar ev bölgesinde mi kontrol et
+            int start = (playerId == 1) ? 18 : 0;
+            int end = (playerId == 1) ? 24 : 6;
+            for (int i = start; i < end; i++) {
+                if (i != from && board[i][1] == playerId && board[i][0] > 0) {
+                    return false; // evde olmayan taş varsa çıkamaz
+                }
+            }
         
+            int fark = (playerId == 1) ? to - from : from - to;
             if (fark == zar1 && !zar1Used) {
                 zar1Used = true;
             } else if (fark == zar2 && !zar2Used) {
@@ -93,15 +101,13 @@ public class Game {
                 return false;
             }
         
-            // Taşı dışarı çıkar
             board[from][0]--;
             if (board[from][0] == 0) board[from][1] = 0;
-        
             out[playerId]++;
             return true;
         }
     
-        // 1. Bar'dan çıkış
+        // 1. Bar’dan çıkış
         if (bar[playerId] > 0) {
             boolean barExit = (playerId == 1) ? to <= 5 : to >= 18;
             if (!barExit || from != -1) return false;
@@ -117,10 +123,9 @@ public class Game {
                 return false;
             }
         
-            // 🚨 Rakip taşı varsa ve 2 veya daha fazlaysa → GİRİLEMEZ
             if (board[to][0] > 1 && board[to][1] != playerId) return false;
         
-            // Eğer sadece 1 rakip taşı varsa → kır
+            // Rakip taşı kır
             if (board[to][0] == 1 && board[to][1] != playerId) {
                 int rakip = board[to][1];
                 bar[rakip]++;
@@ -133,9 +138,8 @@ public class Game {
             board[to][1] = playerId;
             return true;
         }
-
     
-        // 2. Normal taş oynama
+        // 2. Normal taş hareketi
         if (from < 0 || to < 0 || from >= 24 || to >= 24) return false;
         if (board[from][0] == 0 || board[from][1] != playerId) return false;
         if (board[to][0] > 1 && board[to][1] != playerId) return false;
@@ -166,6 +170,7 @@ public class Game {
     
         return true;
     }
+    
     
     
 

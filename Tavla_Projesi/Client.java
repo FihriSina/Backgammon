@@ -45,6 +45,20 @@ public class Client extends JFrame {
         }
     }
 
+    private JPanel createPointPanel(int index) {
+        JPanel pointPanel = new JPanel();
+        pointPanel.setBorder(BorderFactory.createLineBorder(Color.RED)); // test için
+        pointPanel.setLayout(new BoxLayout(pointPanel, BoxLayout.Y_AXIS));
+        pointPanel.setOpaque(false);
+        pointPanel.setPreferredSize(new Dimension(50, 120));
+        pointPanel.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                handlePointClick(index);
+            }
+        });
+        return pointPanel;
+    }
+    
     public Client(String serverIP, int serverPort) {
         
         setTitle("Tavla Client");
@@ -97,21 +111,20 @@ public class Client extends JFrame {
             }
         };
 
-        for (int i = 0; i < 24; i++) {
-            JPanel pointPanel = new JPanel();
-            pointPanel.setBorder(BorderFactory.createLineBorder(Color.RED)); // test için
-            pointPanel.setLayout(new BoxLayout(pointPanel, BoxLayout.Y_AXIS));
-            pointPanel.setOpaque(false);
-            pointPanel.setPreferredSize(new Dimension(50, 120));
-            int index = i;
-            pointPanel.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    handlePointClick(index);
-                }
-            });
+        // Üst sıra (23 → 12): sağdan sola
+        for (int i = 23; i >= 12; i--) {
+            JPanel pointPanel = createPointPanel(i);
             boardPanels[i] = pointPanel;
             boardPanel.add(pointPanel);
         }
+
+        // Alt sıra (0 → 11): soldan sağa
+        for (int i = 0; i <= 11; i++) {
+            JPanel pointPanel = createPointPanel(i);
+            boardPanels[i] = pointPanel;
+            boardPanel.add(pointPanel);
+        }
+
 
         add(boardPanel, BorderLayout.EAST);
 
