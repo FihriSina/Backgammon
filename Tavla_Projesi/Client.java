@@ -213,15 +213,16 @@ public class Client extends JFrame {
                 JLabel lbl = new JLabel();
                 lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
                 lbl.setPreferredSize(new Dimension(30, 30));
-            
-                // Doğru ikonla ölçeklenmiş ImageIcon ata
+
                 ImageIcon baseIcon = (owner == playerId) ? blackStoneIcon : whiteStoneIcon;
                 if (baseIcon != null) {
                     Image scaledImg = baseIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
                     lbl.setIcon(new ImageIcon(scaledImg));
                 }
-            
+
+                lbl.putClientProperty("owner", owner); 
                 boardPanels[i].add(lbl);
+
             }
         
             boardPanels[i].revalidate();
@@ -267,11 +268,12 @@ public class Client extends JFrame {
                 return;
             }
             JLabel topStone = (JLabel) boardPanels[pointIndex].getComponent(count - 1);
-            Icon icon = topStone.getIcon();
-            if ((playerId == 1 && icon != blackStoneIcon) || (playerId == 2 && icon != whiteStoneIcon)) {
+            Integer owner = (Integer) topStone.getClientProperty("owner");
+            if (owner == null || owner != playerId) {
                 chatArea.append("Bu taş size ait değil.\n");
                 return;
             }
+          
             selectedPoint = pointIndex;
             chatArea.append("Taş seçildi: " + pointIndex + "\n");
         } else {
