@@ -1,3 +1,4 @@
+// Güncellenmiş Client.java
 package Tavla_Projesi;
 
 import javax.swing.*;
@@ -34,6 +35,9 @@ public class Client extends JFrame {
     private ImageIcon blackStoneIcon;
     private ImageIcon whiteStoneIcon;
 
+    private JButton barSelectButton;
+    private boolean barSelected = false;
+
     private ImageIcon loadIcon(String path) {
         try {
             Image img = new ImageIcon(getClass().getResource(path)).getImage();
@@ -47,7 +51,7 @@ public class Client extends JFrame {
 
     private JPanel createPointPanel(int index) {
         JPanel pointPanel = new JPanel();
-        pointPanel.setBorder(BorderFactory.createLineBorder(Color.RED)); // test için
+        pointPanel.setBorder(BorderFactory.createLineBorder(Color.RED));
         pointPanel.setLayout(new BoxLayout(pointPanel, BoxLayout.Y_AXIS));
         pointPanel.setOpaque(false);
         pointPanel.setPreferredSize(new Dimension(50, 120));
@@ -58,9 +62,8 @@ public class Client extends JFrame {
         });
         return pointPanel;
     }
-    
+
     public Client(String serverIP, int serverPort) {
-        
         setTitle("Tavla Client");
         setSize(1000, 700);
         setLocationRelativeTo(null);
@@ -79,8 +82,18 @@ public class Client extends JFrame {
         JPanel bottomPanel = new JPanel(new BorderLayout());
         userInputField = new JTextField();
         sendButton = new JButton("Gönder");
+        barSelectButton = new JButton("Bar'dan Taş Seç");
+        barSelectButton.setEnabled(false);
+        barSelectButton.addActionListener(e -> {
+            if (bar[playerId] > 0 && myTurn) {
+                barSelected = true;
+                chatArea.append("Bar'daki taşı çıkarmak için hedef noktaya tıklayın.\n");
+            }
+        });
+
         bottomPanel.add(userInputField, BorderLayout.CENTER);
         bottomPanel.add(sendButton, BorderLayout.EAST);
+        bottomPanel.add(barSelectButton, BorderLayout.WEST);
         add(bottomPanel, BorderLayout.SOUTH);
 
         JPanel dicePanel = new JPanel();
@@ -101,7 +114,6 @@ public class Client extends JFrame {
         barLabel.setBorder(BorderFactory.createTitledBorder("Bar Alanı"));
         add(barLabel, BorderLayout.WEST);
 
-        // Tahta arka planı
         Image bg = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/res/tavlatahtasi.png"));
         boardPanel = new JPanel(new GridLayout(2, 12)) {
             @Override
@@ -111,20 +123,16 @@ public class Client extends JFrame {
             }
         };
 
-        // Üst sıra (23 → 12): sağdan sola
         for (int i = 23; i >= 12; i--) {
             JPanel pointPanel = createPointPanel(i);
             boardPanels[i] = pointPanel;
             boardPanel.add(pointPanel);
         }
-
-        // Alt sıra (0 → 11): soldan sağa
         for (int i = 0; i <= 11; i++) {
             JPanel pointPanel = createPointPanel(i);
             boardPanels[i] = pointPanel;
             boardPanel.add(pointPanel);
         }
-
 
         add(boardPanel, BorderLayout.EAST);
 
@@ -140,7 +148,6 @@ public class Client extends JFrame {
             socket = new Socket(serverIP, serverPort);
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(socket.getOutputStream(), true);
-
             chatArea.append("Server'a bağlandı: " + serverIP + "\n");
 
             new Thread(() -> {
@@ -226,22 +233,17 @@ public class Client extends JFrame {
                 JLabel lbl = new JLabel();
                 lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
                 lbl.setPreferredSize(new Dimension(30, 30));
-
-                ImageIcon baseIcon = (owner == playerId) ? blackStoneIcon : whiteStoneIcon;
+                ImageIcon baseIcon = (owner == 1) ? blackStoneIcon : whiteStoneIcon;
                 if (baseIcon != null) {
                     Image scaledImg = baseIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
                     lbl.setIcon(new ImageIcon(scaledImg));
                 }
-
-                lbl.putClientProperty("owner", owner); 
+                lbl.putClientProperty("owner", owner);
                 boardPanels[i].add(lbl);
-
             }
-        
             boardPanels[i].revalidate();
             boardPanels[i].repaint();
         }
-
 
         if (!barInfo.isEmpty()) {
             String ownSymbol = (playerId == 1) ? "⚫" : "⚪";
@@ -251,6 +253,7 @@ public class Client extends JFrame {
             StringBuilder barStr = new StringBuilder("Bar: ");
             for (int i = 0; i < bar[playerId]; i++) barStr.append(ownSymbol);
             barLabel.setText(barStr.toString());
+            barSelectButton.setEnabled(bar[playerId] > 0 && myTurn);
             if (bar[playerId] > 0)
                 chatArea.append("Bar'da taşınız var. Önce onu tahtaya koymalısınız.\n");
         }
@@ -262,15 +265,23 @@ public class Client extends JFrame {
             return;
         }
 
-        if (bar[playerId] > 0) {
+        if (bar[playerId] > 0 && !barSelected) {
+            chatArea.append("Bar'daki taşı çıkarmalısınız. Önce Bar butonuna tıklayın.\n");
+            return;
+        }
+
+        if (barSelected) {
             int h1 = (playerId == 1) ? zar1 - 1 : 24 - zar1;
             int h2 = (playerId == 1) ? zar2 - 1 : 24 - zar2;
+
             if (pointIndex != h1 && pointIndex != h2) {
                 chatArea.append("Bar'daki taşı sadece " + h1 + " veya " + h2 + ". noktaya koyabilirsiniz.\n");
                 return;
             }
+
             output.println("move:-1->" + pointIndex);
             chatArea.append("Bar'dan hamle: -> " + pointIndex + "\n");
+            barSelected = false;
             return;
         }
 
@@ -286,7 +297,6 @@ public class Client extends JFrame {
                 chatArea.append("Bu taş size ait değil.\n");
                 return;
             }
-          
             selectedPoint = pointIndex;
             chatArea.append("Taş seçildi: " + pointIndex + "\n");
         } else {
