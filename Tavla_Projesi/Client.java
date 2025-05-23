@@ -126,7 +126,7 @@ public class Client extends JFrame {
 
         // Tahta boyutuna uygun panel genişlik ve yükseklik
         int panelWidth = 50;
-        int panelHeight = 120;
+        int panelHeight = 180;
 
         // Şimdi panelleri ekle ve konumlandır
         // X ve Y koordinatlarını istediğin gibi ayarlayabilmen için diziler oluşturduk
@@ -147,30 +147,30 @@ public class Client extends JFrame {
             yPositions[i] = panelHeight + 25;
         }
         xPositions[0] = 25;  // Hazne 0 biraz daha sağa kayar
-        yPositions[0] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[0] = 390; // Hazne 0 biraz daha aşağı kayar
         xPositions[1] = 75;  // Hazne 0 biraz daha sağa kayar
-        yPositions[1] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[1] = 390; // Hazne 0 biraz daha aşağı kayar
         xPositions[2] = 125;  // Hazne 0 biraz daha sağa kayar
-        yPositions[2] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[2] = 390; // Hazne 0 biraz daha aşağı kayar
         xPositions[3] = 175;  // Hazne 0 biraz daha sağa kayar
-        yPositions[3] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[3] = 390; // Hazne 0 biraz daha aşağı kayar
         xPositions[4] = 225;  // Hazne 0 biraz daha sağa kayar
-        yPositions[4] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[4] = 390; // Hazne 0 biraz daha aşağı kayar
         xPositions[5] = 275;  // Hazne 0 biraz daha sağa kayar
-        yPositions[5] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[5] = 390; // Hazne 0 biraz daha aşağı kayar
 
         xPositions[6] = 350;  // Hazne 0 biraz daha sağa kayar
-        yPositions[6] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[6] = 390; // Hazne 0 biraz daha aşağı kayar
         xPositions[7] = 400;  // Hazne 0 biraz daha sağa kayar
-        yPositions[7] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[7] = 390; // Hazne 0 biraz daha aşağı kayar
         xPositions[8] = 450;  // Hazne 0 biraz daha sağa kayar
-        yPositions[8] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[8] = 390; // Hazne 0 biraz daha aşağı kayar
         xPositions[9] = 500;  // Hazne 0 biraz daha sağa kayar
-        yPositions[9] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[9] = 390; // Hazne 0 biraz daha aşağı kayar
         xPositions[10] = 550;  // Hazne 0 biraz daha sağa kayar
-        yPositions[10] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[10] = 390; // Hazne 0 biraz daha aşağı kayar
         xPositions[11] = 600;  // Hazne 0 biraz daha sağa kayar
-        yPositions[11] = 450; // Hazne 0 biraz daha aşağı kayar
+        yPositions[11] = 390; // Hazne 0 biraz daha aşağı kayar
 
         xPositions[12] = 600;  // Hazne 0 biraz daha sağa kayar
         yPositions[12] = 30; // Hazne 0 biraz daha aşağı kayar
