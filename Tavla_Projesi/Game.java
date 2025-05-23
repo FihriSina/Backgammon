@@ -40,13 +40,13 @@ public class Game {
         board[12][0] = 5; board[12][1] = 1; // üst sol
         board[7][0] = 3;  board[7][1] = 1; // alt sağ
         board[5][0] = 5;  board[5][1] = 1; // alt orta
-            
+
         // Oyuncu 2 (beyaz)
         board[0][0] = 2;  board[0][1] = 2; // sol alt köşe
         board[11][0] = 5; board[11][1] = 2; // alt sol
         board[16][0] = 3; board[16][1] = 2; // üst sağ
         board[18][0] = 5; board[18][1] = 2; // üst orta
-            
+
     }
 
     
@@ -64,6 +64,46 @@ public class Game {
             System.out.println("Çift zar atıldı! 4 hamle hakkı.");
         }
     }
+
+    public boolean hasAnyValidMove(int playerId) {
+        // Bar'da taş varsa ve çıkabileceği yer yoksa
+        if (bar[playerId] > 0) {
+            int[] hedefler = new int[] {
+                (playerId == 1) ? dice1 - 1 : 24 - dice1,
+                (playerId == 1) ? dice2 - 1 : 24 - dice2
+            };
+        
+            for (int to : hedefler) {
+                if (to >= 0 && to < 24) {
+                    if (board[to][0] <= 1 || board[to][1] == playerId) return true;
+                }
+            }
+            return false;
+        }
+    
+        // Tahtadaki her taş için
+        for (int from = 0; from < 24; from++) {
+            if (board[from][0] > 0 && board[from][1] == playerId) {
+                int[] hedefler = new int[] {
+                    (playerId == 1) ? from + dice1 : from - dice1,
+                    (playerId == 1) ? from + dice2 : from - dice2
+                };
+                for (int to : hedefler) {
+                    if (to >= 0 && to < 24) {
+                        if (board[to][0] <= 1 || board[to][1] == playerId) return true;
+                    }
+                    // Dışarı çıkarma kontrolü
+                    if ((playerId == 1 && to == 24) || (playerId == 2 && to == -1)) {
+                        // evdeki taşlar kontrolü burada yapılmalı ama basitçe true dönüyoruz
+                        return true;
+                    }
+                }
+            }
+        }
+    
+        return false;
+    }
+    
 
     public String serializeBoard() {
         StringBuilder sb = new StringBuilder();
