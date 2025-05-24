@@ -38,6 +38,8 @@ public class Client extends JFrame {
     private JButton barSelectButton;
     private boolean barSelected = false;
 
+    private JPanel barAreaPanel; // BAR'da taşları göstermek için
+
     private ImageIcon loadIcon(String path) {
         try {
             Image img = new ImageIcon(getClass().getResource(path)).getImage();
@@ -136,6 +138,14 @@ public class Client extends JFrame {
                 g.drawImage(bg, 0, 0, getWidth(), getHeight(), this);
             }
         };
+
+        // BAR panelini oluştur
+        barAreaPanel = new JPanel();
+        barAreaPanel.setLayout(new BoxLayout(barAreaPanel, BoxLayout.Y_AXIS));
+        barAreaPanel.setOpaque(false);  // Şeffaf arka plan
+        barAreaPanel.setBounds(310, 220, 60, 120); // Tahtanın tam ortasına konumlandır (gerekirse ayarla)
+        boardPanel.add(barAreaPanel);
+
 
         // Tahta boyutuna uygun panel genişlik ve yükseklik
         int panelWidth = 50;
@@ -348,8 +358,24 @@ public class Client extends JFrame {
             barSelectButton.setEnabled(bar[playerId] > 0 && myTurn);
             if (bar[playerId] > 0)
                 chatArea.append("Bar'da taşınız var. Önce onu tahtaya koymalısınız.\n");
+        
+            // BAR panelini sıfırla ve taşları güncelle
+            barAreaPanel.removeAll();
+            for (int i = 0; i < bar[playerId]; i++) {
+                JLabel barStone = new JLabel();
+                barStone.setAlignmentX(Component.CENTER_ALIGNMENT);
+                barStone.setPreferredSize(new Dimension(30, 30));
+                ImageIcon baseIcon = (playerId == 1) ? blackStoneIcon : whiteStoneIcon;
+                if (baseIcon != null) {
+                    Image scaledImg = baseIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+                    barStone.setIcon(new ImageIcon(scaledImg));
+                }
+                barAreaPanel.add(barStone);
+            }
+            barAreaPanel.revalidate();
+            barAreaPanel.repaint();
         }
-    }
+    }        
 
     private void handlePointClick(int pointIndex) {
         if (!myTurn) {
