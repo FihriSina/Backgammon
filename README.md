@@ -119,17 +119,10 @@ java Server
 ##  Kullanılan Teknolojiler
 
 * Java SE
-* Java Swing
 * Socket Programlama (TCP)
 * Çoklu İş Parçacığı (Threading)
 * Google Cloud (opsiyonel)
-* SSH Terminal Erişimi
-
-##  Bilinen Sorunlar
-
-* Aynı anda bağlantı denemeleri için ekstra kontrol eklenmelidir.
-* Oyun bittikten sonra istemcilerin sıfırlanması manuel yapılmalı.
-* Kullanıcı adları veya skor takibi henüz eklenmedi.
+* SSH Terminal Erişimi 
 
 ##  Katkı ve Geliştirme
 
@@ -257,16 +250,9 @@ java Server
 ##  Technologies Used
 
 * Java SE
-* Java Swing (GUI)
 * TCP Socket Programming
 * Multi-threading (ExecutorService)
 * Cloud compatibility (Google Cloud SSH)
-
-##  Known Limitations
-
-* No concurrency control for simultaneous new connections
-* Game reset is manual post-completion
-* No user login or persistent player tracking yet
 
 ##  Contributions & Extensions
 
