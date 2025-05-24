@@ -32,7 +32,7 @@ AbdullahSinaKORKMAZ_2021221044_networklab_2025_proje/
 
 ````
 
-## 🔧 Kurulum ve Çalıştırma
+##  Kurulum ve Çalıştırma
 
 ### 1. Java Kurulumu
 
@@ -110,7 +110,7 @@ java Server
   * Zaman sınırlı hamleler
   * Katlama küpü
 
-## 📸 Örnek Arayüz
+##  Örnek Arayüz
 
 > Oyun başlangıcında kullanıcıya tahta, zarlar ve taşlar gösterilir.
 
