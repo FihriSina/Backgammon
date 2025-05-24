@@ -1,4 +1,3 @@
-// Güncellenmiş Client.java
 package Tavla_Projesi;
 
 import javax.swing.*;

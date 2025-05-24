@@ -1,6 +1,5 @@
 package Tavla_Projesi;
 
-
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.*;
