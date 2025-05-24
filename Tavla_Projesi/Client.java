@@ -51,18 +51,31 @@ public class Client extends JFrame {
 
     private JPanel createPointPanel(int index) {
         JPanel pointPanel = new JPanel();
-        pointPanel.setBorder(BorderFactory.createLineBorder(Color.RED));
         pointPanel.setLayout(new BoxLayout(pointPanel, BoxLayout.Y_AXIS));
         pointPanel.setOpaque(false);
         pointPanel.setPreferredSize(new Dimension(50, 120));
         
+        // Hover efekti
         pointPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                pointPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2)); // Hover olduğunda mavi kenarlık
+            }
+        
+            @Override
+            public void mouseExited(MouseEvent e) {
+                pointPanel.setBorder(null); // Çıkınca border'ı kaldır
+            }
+        
+            @Override
             public void mouseClicked(MouseEvent e) {
                 handlePointClick(index);
             }
         });
+    
         return pointPanel;
     }
+    
 
     public Client(String serverIP, int serverPort) {
         setTitle("Tavla Client");
@@ -185,17 +198,17 @@ public class Client extends JFrame {
         xPositions[17] = 350;  // Hazne 0 biraz daha sağa kayar
         yPositions[17] = 30; // Hazne 0 biraz daha aşağı kayar
 
-        xPositions[18] = 25;  // Hazne 0 biraz daha sağa kayar
+        xPositions[18] = 275;  // Hazne 0 biraz daha sağa kayar
         yPositions[18] = 30; // Hazne 0 biraz daha aşağı kayar
-        xPositions[19] = 75;  // Hazne 0 biraz daha sağa kayar
+        xPositions[19] = 225;  // Hazne 0 biraz daha sağa kayar
         yPositions[19] = 30; // Hazne 0 biraz daha aşağı kayar
-        xPositions[20] = 125;  // Hazne 0 biraz daha sağa kayar
+        xPositions[20] = 175;  // Hazne 0 biraz daha sağa kayar
         yPositions[20] = 30; // Hazne 0 biraz daha aşağı kayar
-        xPositions[21] = 175;  // Hazne 0 biraz daha sağa kayar
+        xPositions[21] = 125;  // Hazne 0 biraz daha sağa kayar
         yPositions[21] = 30; // Hazne 0 biraz daha aşağı kayar
-        xPositions[22] = 225;  // Hazne 0 biraz daha sağa kayar
+        xPositions[22] = 75;  // Hazne 0 biraz daha sağa kayar
         yPositions[22] = 30; // Hazne 0 biraz daha aşağı kayar
-        xPositions[23] = 275;  // Hazne 0 biraz daha sağa kayar
+        xPositions[23] = 25;  // Hazne 0 biraz daha sağa kayar
         yPositions[23] = 30; // Hazne 0 biraz daha aşağı kayar
 
         // Panelleri oluştur, konumlandır ve ekle

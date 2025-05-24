@@ -30,7 +30,7 @@ public class Game {
     private void initializeBoard() {
         // 23 numaralı hazineye 2 tane siyah taş koy (oyuncu 1)
         board[23][0] = 5;    // Taş sayısı
-        board[23][1] = 0;    // Oyuncu numarası (1: siyah)
+        board[23][1] = 2;    // Oyuncu numarası (1: siyah)
 
         // 12 numaralı hazineye 5 tane siyah taş koy
         board[12][0] = 5;
