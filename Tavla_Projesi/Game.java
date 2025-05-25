@@ -16,7 +16,7 @@ public class Game {                     // Tavla oyunu mantığını içeren sı
     private int doubleValue = -1;       // Çift zarın değeri
 
     private int[] bar = new int[3];     // Bar'daki taş sayısı [0: boş, 1: siyah, 2: beyaz]
-    int[] out = new int[3];         // Oyuncuların dışarı attığı taş sayısı [0: boş, 1: siyah, 2: beyaz]
+    public int[] out = new int[3];         // Oyuncuların dışarı attığı taş sayısı [0: boş, 1: siyah, 2: beyaz]
 
     private Random random;              // Zar için ratgele sayı üreteci
 
