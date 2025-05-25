@@ -128,9 +128,54 @@ java Server
 
 Feel free to fork the project, submit pull requests, or open issues to suggest improvements. Contributions are welcome!
 
+
 ---
 
 
+# Inter-Class Communication and UML Diagram
+
+This project is based on a multiplayer game system. Below is a summary of the inter-class relationships and overall architectural structure. The UML diagram was generated using the Code2UML tool, so there may be minor inaccuracies in some parts.
+
+## 1. Server and ClientHandler
+
+- `ClientHandler` is defined as an **inner class** within the `Server` class.
+- A new `ClientHandler` instance is created for each client connection.
+- The `Server` maintains and manages all connected `ClientHandler` instances in a list.
+
+## 2. Server and Game
+
+- The `Server` contains a `Game` object.
+- The `ClientHandler` uses this `Game` object to perform game-related operations.
+
+## 3. Client and Server
+
+- The `Client` connects to the `Server` using a **TCP socket**.
+- Communication between them is handled via message exchange.
+
+## 4. Client and Game
+
+- There is no direct object relationship between `Client` and `Game`.
+- However, the `Client` updates the game state (the state of the `Game` object) based on messages received from the server.
+
+## 5. Relationship Summary
+
+| Classes                    | Type of Relationship                             |
+|----------------------------|--------------------------------------------------|
+| `Server` ↔ `ClientHandler` | Nested structure, direct object relationship     |
+| `Server` ↔ `Game`          | Object usage for game logic                      |
+| `ClientHandler` ↔ `Game`   | Actions, dice rolls, board operations            |
+| `Client` ↔ `Server`        | Communication over the network (TCP)             |
+| `Client` ↔ `Game`          | Indirect, via message-based interaction          |
+
+
+---
+
+
+![UML](https://github.com/user-attachments/assets/c78fd369-edbb-4f4d-86c0-e5e25da5d70c)
+
+
+
+---
 # Ağ Tabanlı Tavla Oyunu – Java
 
 ##  Proje Amacı
