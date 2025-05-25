@@ -41,7 +41,7 @@ public class Client extends JFrame { // GUI - Taş Seçip Hamle Yapma - Zar Atma
     private JPanel barAreaPanel;                    // Bar alanı için panel, taşların gösterileceği yer 
 
 
-//-----------------------------------------------GUI----------------------------------------------------------------
+/*-----------------------------------------------GUI-----------------------------------------------------------------------------------------------------------------------------------------*/
     private ImageIcon loadIcon(String path) {       // İkon Yükleme Metodu
         try {
             Image img = new ImageIcon(getClass().getResource(path)).getImage();
@@ -246,7 +246,7 @@ public class Client extends JFrame { // GUI - Taş Seçip Hamle Yapma - Zar Atma
 
         sendButton.addActionListener(e -> sendMessage()); // Enter tuşu veya butona basış
         userInputField.addActionListener(e -> sendMessage());
-//-----------------------------------------------GUI----------------------------------------------------------------
+/*-----------------------------------------------GUI-----------------------------------------------------------------------------------------------------------------------------------------*/
         try {// Sunucu bağlantı
             socket = new Socket(serverIP, serverPort);// Sunucu IP ve portuna bağla
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));// Sunucudan gelen mesajları okumak için BufferedReader
