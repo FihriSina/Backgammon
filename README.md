@@ -351,5 +351,3 @@ Bu proje, çok oyunculu bir oyun sistemi üzerine kuruludur. Aşağıda, sınıf
 
 
 ![UML](https://github.com/user-attachments/assets/3916fde7-eeea-4d4c-83e4-1947d46b6d90)
-[BilgisayarAğları Raporu2.pdf](https://github.com/user-attachments/files/20430429/BilgisayarAglari.Raporu2.pdf)
-
