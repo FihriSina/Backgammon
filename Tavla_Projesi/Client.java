@@ -60,7 +60,7 @@ public class Client extends JFrame { // GUI - Taş Seçip Hamle Yapma - Zar Atma
         pointPanel.setPreferredSize(new Dimension(50, 120));//Panel boyutu
         
         // Panel Üzerine gelince mavi kenarlık x24
-        pointPanel.addMouseListener(new MouseAdapter() {
+        pointPanel.addMouseListener(new MouseAdapter() {//-----------------------------------------------------------------------------------------> Hazneleri tıklanılablir yapma
             @Override
             public void mouseEntered(MouseEvent e) {
                 pointPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2)); // Hover olduğunda mavi kenarlık
