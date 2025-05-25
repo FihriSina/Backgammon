@@ -136,28 +136,28 @@ Feel free to fork the project, submit pull requests, or open issues to suggest i
 
 This project is based on a multiplayer game system. Below is a summary of the inter-class relationships and overall architectural structure. The UML diagram was generated using the Code2UML tool, so there may be minor inaccuracies in some parts.
 
-# 1. Server and ClientHandler
+### 1. Server and ClientHandler
 
 - `ClientHandler` is defined as an **inner class** within the `Server` class.
 - A new `ClientHandler` instance is created for each client connection.
 - The `Server` maintains and manages all connected `ClientHandler` instances in a list.
 
-# 2. Server and Game
+### 2. Server and Game
 
 - The `Server` contains a `Game` object.
 - The `ClientHandler` uses this `Game` object to perform game-related operations.
 
-# 3. Client and Server
+### 3. Client and Server
 
 - The `Client` connects to the `Server` using a **TCP socket**.
 - Communication between them is handled via message exchange.
 
-# 4. Client and Game
+### 4. Client and Game
 
 - There is no direct object relationship between `Client` and `Game`.
 - However, the `Client` updates the game state (the state of the `Game` object) based on messages received from the server.
 
-# 5. Relationship Summary
+### 5. Relationship Summary
 
 | Classes                    | Type of Relationship                             |
 |----------------------------|--------------------------------------------------|
@@ -315,28 +315,28 @@ Projeye katkıda bulunmak isteyenler, fork yaparak önerilerini uygulayabilir. G
 
 Bu proje, çok oyunculu bir oyun sistemi üzerine kuruludur. Aşağıda, sınıflar arası ilişkiler ve genel mimari yapıyı açıklayan özet bilgiler yer almaktadır. UML diyagramı Code2UML aracı ile oluşturulmuştur; bu nedenle bazı bölümlerde küçük hatalar olabilir.
 
-# 1. Server ve ClientHandler
+### 1. Server ve ClientHandler
 
 - `ClientHandler`, `Server` sınıfı içerisinde **iç sınıf (inner class)** olarak tanımlanmıştır.
 - Her istemci bağlantısı için bir `ClientHandler` nesnesi oluşturulur.
 - `Server`, bağlı tüm `ClientHandler` nesnelerini bir listede tutar ve yönetir.
 
-# 2. Server ve Game
+### 2. Server ve Game
 
 - `Server` sınıfı içerisinde bir adet `Game` nesnesi oluşturulur.
 - `ClientHandler`, oyunla ilgili işlemleri gerçekleştirmek için bu `Game` nesnesine erişir.
 
-# 3. Client ve Server
+### 3. Client ve Server
 
 - `Client`, `Server` ile **TCP socket** üzerinden bağlantı kurar.
 - İki taraf arasında mesaj alışverişi ile iletişim sağlanır.
 
-# 4. Client ve Game
+### 4. Client ve Game
 
 - `Client` ile `Game` sınıfı arasında doğrudan bir nesne ilişkisi yoktur.
 - Ancak `Client`, sunucudan gelen mesajlar aracılığıyla oyun durumunu (yani `Game` nesnesinin durumunu) günceller.
 
-# 5. İlişki Özeti
+### 5. İlişki Özeti
 
 | Sınıflar                  | İlişki Türü                              |
 |---------------------------|------------------------------------------|
