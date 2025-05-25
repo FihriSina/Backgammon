@@ -1,4 +1,4 @@
-package Tavla_Projesi;                  // Paket Bilgisi
+package Tavla_Projesi;                  
 
 import java.util.Random;                // Rastgele sayı üretimi için gerekli kütüphane
 
