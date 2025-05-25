@@ -119,6 +119,7 @@ java Server
 ##  Kullanılan Teknolojiler
 
 * Java SE
+* Swing
 * Socket Programlama (TCP)
 * Çoklu İş Parçacığı (Threading)
 * Google Cloud (opsiyonel)
@@ -127,6 +128,40 @@ java Server
 ##  Katkı ve Geliştirme
 
 Projeye katkıda bulunmak isteyenler, fork yaparak önerilerini uygulayabilir. Geri bildirim ve PR’lar memnuniyetle değerlendirilir.
+
+Sınıflar Arası İletişim ve UML Diyagramı
+Bu proje, çok oyunculu bir oyun sistemi üzerine kuruludur. Aşağıda, sınıflar arası ilişkiler ve genel mimari yapıyı açıklayan özet bilgiler yer almaktadır. UML diyagramı Code2UML aracı ile oluşturulmuştur; bu nedenle bazı bölümlerde küçük hatalar olabilir.
+
+1. Server ve ClientHandler
+ClientHandler, Server sınıfı içerisinde iç sınıf (inner class) olarak tanımlanmıştır.
+
+Her istemci bağlantısı için bir ClientHandler nesnesi oluşturulur.
+
+Server, bağlı tüm ClientHandler nesnelerini bir listede tutar ve yönetir.
+
+2. Server ve Game
+Server sınıfı içerisinde bir adet Game nesnesi oluşturulur.
+
+ClientHandler, oyunla ilgili işlemleri gerçekleştirmek için bu Game nesnesine erişir.
+
+3. Client ve Server
+Client, Server ile TCP socket üzerinden bağlantı kurar.
+
+İki taraf arasında mesaj alışverişi ile iletişim sağlanır.
+
+4. Client ve Game
+Client ile Game sınıfı arasında doğrudan bir nesne ilişkisi yoktur.
+
+Ancak Client, sunucudan gelen mesajlar aracılığıyla oyun durumunu (yani Game nesnesinin durumunu) günceller.
+
+5. İlişki Özeti
+Sınıflar	İlişki Türü
+Server ↔ ClientHandler	İç içe yapı, doğrudan nesne ilişkisi
+Server ↔ Game	Oyun mantığı için nesne kullanımı
+ClientHandler ↔ Game	Hamle, zar, tahta işlemleri
+Client ↔ Server	Ağ üzerinden (TCP) iletişim
+Client ↔ Game	Dolaylı, mesajlar üzerinden etkileşim
+
 
 
 # Network-Based Backgammon Game – Java
@@ -250,6 +285,7 @@ java Server
 ##  Technologies Used
 
 * Java SE
+* Swing
 * TCP Socket Programming
 * Multi-threading (ExecutorService)
 * Cloud compatibility (Google Cloud SSH)
