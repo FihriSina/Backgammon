@@ -1,32 +1,33 @@
 package Tavla_Projesi;
 
+// Gerekli kütüphaneleri
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.*;
 import java.util.*;
 
-public class Server {
+public class Server {// Tavla Client - GUI, Zar Atma, Taş Seçme ve Hamle Yapma
 
     private static final int PORT = 5000;
     // Bağlantıları yönetecek thread havuzu oluşturuyorum. (Performan Etkili)
-    private static ExecutorService pool = Executors.newFixedThreadPool(10); // 10 threadli havuz
+    private static ExecutorService pool = Executors.newFixedThreadPool(10); // 10 threadli havuz(2 de yeter)
 
     // Oyuncu bağlantı listesi
     private static List<ClientHandler> clients = Collections.synchronizedList(new ArrayList<>());
 
     // Oyun nesnesi (tavla mantığı için)
-    public static Game game = new Game(); // Game sınıfını aldık.
+    public static Game game = new Game(); // Game sınıfını alımı
 
     public static void main(String[] args){
         
         System.out.println("Server başlatılıyor...");
 
         try {
-            // Sunucu soketini 5000 num' lı porta bağlıyorum.
+            // Sunucu soketini 5000 num' lı porta bağlama
             ServerSocket serverSocket = new ServerSocket(PORT);
             System.out.println("Server " + PORT + " portunda dinleniyor...");
 
-            while (clients.size() < 2) { // 2 oyuncu bağlantısı bekliyorum
+            while (clients.size() < 2) { // 2 oyuncu bağlantısı bekleme
 
                 // İstemci bağlantısı kabul etme
                 Socket clientSocket = serverSocket.accept();
@@ -58,7 +59,6 @@ public class Server {
         System.out.println("Sıra Oyuncu 1'de.");
         int currentPlayerIndex = 0;
     }
-
         public static List<ClientHandler> getClients() {
         return clients;
     }
@@ -72,58 +72,54 @@ class ClientHandler implements Runnable {
     private PrintWriter output;
     private int playerId;
 
-    public ClientHandler(Socket socket, int playerId) {
+    public ClientHandler(Socket socket, int playerId) {// Client bağlantısı için gerekli parametreleri alır
         this.socket = socket;
         this.playerId = playerId;
     }
 
-    public int getPlayerId() {
+    public int getPlayerId() {// Oyuncu ID'sini döndür
         return playerId;
     }
 
-    public void sendMessage(String message) {
+    public void sendMessage(String message) {// İstemciye mesaj gönderir
         if (output != null) {
             output.println(message);
         }
     }
     
-
-
     @Override
-    public void run() {
+    public void run() {// Client bağlantısı için gerekli işlemler
         try {
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            output = new PrintWriter(socket.getOutputStream(), true);
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));// Client tan gelen veriyi okur
+            output = new PrintWriter(socket.getOutputStream(), true);// Client'a veri gönderir
 
-            output.println("Sunucuya bağlandınız. Oyuncu ID'niz: " + playerId);
+            output.println("Sunucuya bağlandınız. Oyuncu ID'niz: " + playerId);//Client a bildirim
 
             String message;
-            while ((message = input.readLine()) != null) {
-                System.out.println("Oyuncu " + playerId + ": " + message);
+            while ((message = input.readLine()) != null) {// Client'tan gelen mesajları okur
+                System.out.println("Oyuncu " + playerId + ": " + message);// Gelen mesajı konsola yazdırır
 
-                // RESET KOMUTU
-                if (message.equals("reset_game")) {
+                if (message.equals("reset_game")) {// Oyun resetleme isteği
                     System.out.println("Oyuncu " + playerId + " oyunu resetledi.");
                     Server.game = new Game();
                     for (ClientHandler c : Server.getClients()) {
                         c.sendMessage("TAHTA:" + Server.game.serializeBoard());
                     }
-                    for (ClientHandler c : Server.getClients()) {
+                    for (ClientHandler c : Server.getClients()) {// Her Client'a reset mesajı gönder
                         c.sendMessage("RESET");
                     }
-                    for (ClientHandler c : Server.getClients()) {
+                    for (ClientHandler c : Server.getClients()) {// Sıra 1. oyuncuda başlasın
                         if (c.getPlayerId() == 1) {
                             c.sendMessage("SIRA");
                         } else {
-                            c.sendMessage("Rakip zar atacak...");
+                            c.sendMessage("Rakip zar atacak...");// 2. oyuncuya sıra geldiğinde zar atacak mesajı gönder
                         }
                     }
                     continue;
                 }
 
-                // Zar atma isteği
-                if (message.equals("roll_dice")) {
-                    if (playerId != Server.game.getCurrentPlayer()) {
+                if (message.equals("roll_dice")) {// Zar atma isteği
+                    if (playerId != Server.game.getCurrentPlayer()) {// Sıra kontrolü
                         sendMessage("Sıra sizde değil, zar atamazsınız.");
                         continue;
                     }
@@ -132,7 +128,7 @@ class ClientHandler implements Runnable {
                     int d1 = Server.game.getDice1();
                     int d2 = Server.game.getDice2();
 
-                    for (ClientHandler c : Server.getClients()) {
+                    for (ClientHandler c : Server.getClients()) {// Her Client'a zar atma sonucu gönder
                         if (c.getPlayerId() == playerId) {
                             c.sendMessage("ZARLAR:" + d1 + "," + d2);
                         } else {
@@ -142,10 +138,10 @@ class ClientHandler implements Runnable {
                     }
 
                     // Zar sonrası hamle yapılabilir mi kontrolü
-                    if (!Server.game.hasAnyValidMove(playerId)) {
+                    if (!Server.game.hasAnyValidMove(playerId)) {// Eğer geçerli hamle yoksa
                         sendMessage("Hiç geçerli hamleniz yok. Sıra geçiyor.");
-                        Server.game.switchPlayer();
-                        for (ClientHandler c : Server.getClients()) {
+                        Server.game.switchPlayer();// Sıra değiş
+                        for (ClientHandler c : Server.getClients()) {// Sıra değiştiğinde her Client'a mesaj gönder
                             if (c.getPlayerId() == Server.game.getCurrentPlayer()) {
                                 c.sendMessage("SIRA");
                             }
@@ -156,20 +152,20 @@ class ClientHandler implements Runnable {
                 }
 
                 // Taş hamlesi
-                if (message.startsWith("move:")) {
+                if (message.startsWith("move:")) {// Hamle yapma isteği
                     if (playerId != Server.game.getCurrentPlayer()) {
                         sendMessage("Sıra sizde değil, hamle yapamazsınız.");
                         continue;
                     }
 
-                    String[] parts = message.substring(5).split("->");
-                    int from = Integer.parseInt(parts[0]);
-                    int to = parts[1].equals("OUT") ? (playerId == 1 ? 24 : -1) : Integer.parseInt(parts[1]);
+                    String[] parts = message.substring(5).split("->");// Hamle formatı: move:from->to
+                    int from = Integer.parseInt(parts[0]);// Hamle başlangıç noktası
+                    int to = parts[1].equals("OUT") ? (playerId == 1 ? 24 : -1) : Integer.parseInt(parts[1]);// Hamle bitiş noktası
 
                     int d1 = Server.game.getDice1();
                     int d2 = Server.game.getDice2();
 
-                    boolean success = Server.game.movePiece(from, to, playerId, d1, d2);
+                    boolean success = Server.game.movePiece(from, to, playerId, d1, d2);// Hamle yapma işlemi
                     if (!success) {
                         sendMessage("Geçersiz hamle! Kurallara uymuyor.");
                         continue;
