@@ -59,7 +59,7 @@ public class Client extends JFrame { // GUI - Taş Seçip Hamle Yapma - Zar Atma
         pointPanel.setOpaque(false);// Paneli şeffaf yapılır
         pointPanel.setPreferredSize(new Dimension(50, 120));//Panel boyutu
         
-        // Panel Üzerine gelince mavi kenarlık 
+        // Panel Üzerine gelince mavi kenarlık x24
         pointPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
